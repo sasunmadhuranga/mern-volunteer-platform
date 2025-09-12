@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiUser } from "react-icons/fi";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 export default function AdminNavbar(){
@@ -44,7 +43,11 @@ export default function AdminNavbar(){
         navigate("/login");
     }
     if (error) return <p className="font-medium text-red-600">{error}</p>
-    if (!user) return <p>...Loading</p>
+    if (!user && !error) return (
+        <div className="flex justify-center items-center py-6">
+            <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        );
 
     return(
         <div className="sticky top-0 z-50 bg-blue-700 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">

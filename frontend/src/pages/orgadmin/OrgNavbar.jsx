@@ -59,10 +59,10 @@ export default function OrgNavbar() {
           <img
             src={profilePicUrl}
             alt="Profile"
-            className="w-10 h-10 rounded-full object-cover border flex-shrink-0"
+            className="w-14 h-14 rounded-full object-cover border flex-shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
             <FiUser className="w-6 h-6 text-gray-600" />
           </div>
         )}
