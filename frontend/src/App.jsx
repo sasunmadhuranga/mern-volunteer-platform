@@ -3,7 +3,7 @@ import Signup from './pages/Signup';
 import Login from "./pages/Login";
 import './index.css';
 import Landing from "./pages/Landing";
-import VolunteerDashboard from "./pages/VolunteerDashboard";
+import VolunteerDashboard from "./pages/volunteer/VolunteerDashboard";
 import OrgDashboard from './pages/orgadmin/OrgDashboard';
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import OrgProfile from './pages/orgadmin/OrgProfile';
@@ -12,6 +12,8 @@ import OrgAddEvents from './pages/orgadmin/OrgAddEvents';
 import OrgVerification from './pages/orgadmin/OrgVerification';
 import OrgManageEvents from './pages/orgadmin/OrgManageEvents';
 import EventVerification from './pages/admin/EventVerification';
+import EventsSection from './pages/volunteer/EventsSection';
+import VolunteerProfile from './pages/volunteer/VolunteerProfile';
 export default function App() {
   return (
     <Router> 
@@ -19,8 +21,6 @@ export default function App() {
         <Route path="/" element={<Landing/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/login" element={<Login/>}/>
-        <Route path="/volunteer/dashboard" element={<VolunteerDashboard/>}/>
-        <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
         
         <Route 
           path="/org/*" 
@@ -46,6 +46,18 @@ export default function App() {
         >
           <Route path="eventverification" element={<EventVerification/>}/>
         </Route>
+        <Route
+          path="/volunteer/*"
+          element={
+            <ProtectedRoute role="VOLUNTEER">
+              <VolunteerDashboard/>
+            </ProtectedRoute>
+          }
+        >
+          <Route path="eventsection" element={<EventsSection/>}/>
+          <Route path="volunteerprofile" element={<VolunteerProfile/>}/>
+        </Route>
+
       </Routes>
     </Router>
   );

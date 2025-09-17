@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ConfirmationModel from "../components/ConfirmationModel";
 
 export default function AdminEventVerification() {
   const [events, setEvents] = useState([]);
   const [error, setError] = useState("");
-
+  const [showModel, setShowModel] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+ 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -29,11 +33,26 @@ export default function AdminEventVerification() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEvents(events.map(e => e._id === id ? { ...e, status } : e));
+      setShowModel(false);
     } catch {
       setError("Failed to update event status.");
     }
   };
-
+  const handleActionClick = (id, status) => {
+    setSelectedEventId(id);
+    setSelectedStatus(status);
+    setShowModel(true);
+  }
+  const handleConfirm = () => {
+    if(selectedEventId && selectedStatus){
+        updateStatus(selectedEventId, selectedStatus);
+    }
+  }
+  const handleCancel = () => {
+    setShowModel(false);
+    setSelectedEventId(null);
+    setSelectedStatus("");
+  }
   if (error) return <p className="text-red-600">{error}</p>;
   
 return (
@@ -80,13 +99,13 @@ return (
 
                         <div className="mt-6 flex justify-end gap-4">
                             <button
-                                onClick={() => updateStatus(event._id, "approved")}
+                                onClick={() => handleActionClick(event._id, "approved")}
                                 className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"
                             >
                                 ✅ Approve
                             </button>
                             <button 
-                                onClick={() => updateStatus(event._id, "rejected")}
+                                onClick={() => handleActionClick(event._id, "rejected")}
                                 className="flex items-center gap-2 px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition"
                             >
                                 ❌ Reject
@@ -96,6 +115,13 @@ return (
                 ))}
             </div>
         )}
+        {showModel && 
+            <ConfirmationModel
+            message={`Are you sure you want to ${selectedStatus} this event?`}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+            />
+        }
     </div>
 );
 }

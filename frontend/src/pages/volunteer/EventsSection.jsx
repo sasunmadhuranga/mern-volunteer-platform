@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function VolunteerDashboard() {
+export default function EventsSection() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
