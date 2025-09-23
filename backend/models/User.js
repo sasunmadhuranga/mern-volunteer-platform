@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema({
   profilePic: { type: String, default: "" },
   contactEmail: { type: String, default: "" },
   phone: { type: String, default: "" },
+  birthday: {type: Date, default: null},
+  gender: {type: String, default: ""},
+  address: {type: String, default: ""},
+  city: {type: String, default: ""},
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

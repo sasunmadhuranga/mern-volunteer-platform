@@ -8,7 +8,7 @@ export default function AdminEventVerification() {
   const [showModel, setShowModel] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
- 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -17,18 +17,18 @@ export default function AdminEventVerification() {
     }
 
     axios
-      .get("http://localhost:5000/api/events/all", {
+      .get(`${API_BASE_URL}/api/events/all`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setEvents(res.data))
       .catch(() => setError("Failed to load events."));
-  }, []);
+  }, [API_BASE_URL]);
 
   const updateStatus = async (id, status) => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `http://localhost:5000/api/events/${id}/status`,
+        `${API_BASE_URL}/api/events/${id}/status`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -71,8 +71,10 @@ return (
                         <h3 className="text-xl font-semibold text-center text-gray-800 mb-4">{event.eventName}</h3>
                         
                         <div className="grid md:grid-cols-2 gap-4 text-gray-700">
+                            <p><span className="font-medium">Event Type:</span> {event.eventType}</p>
                             <p><span className="font-medium">Organized by:</span> {event.institute}</p>
                             <p><span className="font-medium">Location:</span> {event.location}</p>
+                            <p><span className="font-medium">City:</span> {event.city}</p>
                             <p><span className="font-medium">Duration:</span> {new Date(event.startDate).toLocaleDateString()} → {new Date(event.endDate).toLocaleDateString()}</p>
                             <p><span className="font-medium">Opportunities:</span> {event.opportunity}</p>
                             <p><span className="font-medium">Age Limit:</span> {event.minAge} - {event.maxAge}</p>

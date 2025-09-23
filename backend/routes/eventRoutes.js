@@ -9,34 +9,40 @@ const router = express.Router();
 router.post("/add", authenticateToken, async (req, res) => {
   try {
     const {
+      eventType,
       eventName,
       institute,
       location,
+      city,
       startDate,
       endDate,
       opportunity,
       minAge,
       maxAge,
       description,
+      qualification,
       minDay,
     } = req.body;
 
     // ✅ basic validation
-    if (!eventName || !institute || !location || !startDate || !opportunity || !minAge || !maxAge || !description || !minDay) {
+    if (!eventType || !eventName || !institute || !location || !city || !startDate || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
     // ✅ create event
     const event = new Event({
+      eventType,
       eventName,
       institute,
       location,
+      city,
       startDate,
       endDate,
       opportunity,
       minAge,
       maxAge,
       description,
+      qualification,
       minDay,
       createdBy: req.user.id, // org id
     });

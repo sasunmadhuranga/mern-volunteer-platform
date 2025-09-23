@@ -76,10 +76,8 @@ export default function AdminNavbar(){
     
           {/* Desktop Nav Links */}
           <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
-            <Link to="/org/profile" className="hover:text-gray-300">Profile</Link>
-            <Link to="/org/addevents" className="hover:text-gray-300">Add Events</Link>
-            <Link to="/org/manageevents" className="hover:text-gray-300">Manage Events</Link>
-            <Link to="/org/verification" className="hover:text-gray-300">Verification</Link>
+            <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300">Profile</Link>
+            <Link to="/volunteer/eventsection" className="hover:text-gray-300">Events</Link>
             <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
           </div>
     
@@ -94,12 +92,10 @@ export default function AdminNavbar(){
     
           {/* Mobile Nav */}
           {menuOpen && (
-            <div className="absolute top-full left-0 w-full bg-blue-700 shadow-md md:hidden animate-slide-down z-40">
+            <div className="absolute top-full left-0 w-full bg-teal-800 shadow-md md:hidden animate-slide-down z-40">
               <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
-                <Link to="/org/profile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
-                <Link to="/org/addevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Add Events</Link>
-                <Link to="/org/manageevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Events</Link>
-                <Link to="/org/verification" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Verification</Link>
+                <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
+                <Link to="/volunteer/eventsection" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Events</Link>
                 <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
               </div>
             </div>
