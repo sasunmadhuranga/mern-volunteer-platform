@@ -83,4 +83,37 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/search", authenticateToken, async (req, res) => {
+  try {
+    const { eventType, eventName, city } = req.query;
+    const query = {};
+
+    if (eventType) {
+      query.eventType = eventType;
+    }
+
+    if (eventName) {
+      // Case-insensitive partial match
+      query.eventName = { $regex: eventName, $options: "i" };
+    }
+
+    if (city) {
+      query.city = { $regex: city, $options: "i" };
+    }
+
+    // Only fetch approved events for regular users
+    if (req.user.role === "VOLUNTEER") {
+      query.status = "approved";
+    }
+
+    const events = await Event.find(query).populate("createdBy", "name role");
+
+    res.json(events);
+  } catch (err) {
+    console.error("Error searching events:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 export default router;
