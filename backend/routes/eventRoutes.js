@@ -93,7 +93,6 @@ router.get("/search", authenticateToken, async (req, res) => {
     }
 
     if (eventName) {
-      // Case-insensitive partial match
       query.eventName = { $regex: eventName, $options: "i" };
     }
 
@@ -101,14 +100,34 @@ router.get("/search", authenticateToken, async (req, res) => {
       query.city = { $regex: city, $options: "i" };
     }
 
-    // Only fetch approved events for regular users
     if (req.user.role === "VOLUNTEER") {
       query.status = "approved";
     }
 
-    const events = await Event.find(query).populate("createdBy", "name role");
+    // Populate createdBy to get org user info (name, email, etc.)
+    const events = await Event.find(query).populate("createdBy", "name _id role");
 
-    res.json(events);
+    // Map events to add organizerId and optionally overwrite institute with createdBy.name
+    const mappedEvents = events.map(event => ({
+      _id: event._id,
+      eventType: event.eventType,
+      eventName: event.eventName,
+      institute: event.institute || event.createdBy.name, // fallback to createdBy name if institute missing
+      location: event.location,
+      city: event.city,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      opportunity: event.opportunity,
+      minAge: event.minAge,
+      maxAge: event.maxAge,
+      description: event.description,
+      qualification: event.qualification,
+      minDay: event.minDay,
+      status: event.status,
+      organizerId: event.createdBy._id.toString(),  // this is what frontend expects
+    }));
+
+    res.json(mappedEvents);
   } catch (err) {
     console.error("Error searching events:", err);
     res.status(500).json({ message: "Server error" });

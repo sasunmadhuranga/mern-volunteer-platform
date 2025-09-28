@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   profilePic: { type: String, default: "" },
   contactEmail: { type: String, default: "" },
   phone: { type: String, default: "" },
+  aboutInfo: {type: String, default: ""},
   birthday: {type: Date, default: null},
   gender: {type: String, default: ""},
   address: {type: String, default: ""},

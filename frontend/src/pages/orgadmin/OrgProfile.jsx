@@ -8,6 +8,7 @@ export default function OrgProfile() {
   const [email, setEmail] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [aboutInfo, setAboutInfo] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState(null); // stored URL from DB
   const [profilePicFile, setProfilePicFile] = useState(null); // file to upload
   const [preview, setPreview] = useState(null);
@@ -18,6 +19,7 @@ export default function OrgProfile() {
   const [originalProfilePic, setOriginalProfilePic] = useState(null);
   const [originalContactEmail, setOriginalContactEmail] = useState("");
   const [originalPhone, setOriginalPhone] = useState("");
+  const [originalAboutInfo, setOriginalAboutInfo] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,6 +45,7 @@ export default function OrgProfile() {
             );
             setContactEmail(userData.contactEmail || "");
             setPhone(userData.phone || "");
+            setAboutInfo(userData.aboutInfo || "")
 
             // ✅ Correctly set original values from userData
             setOriginalName(userData.name);
@@ -50,6 +53,7 @@ export default function OrgProfile() {
             setOriginalContactEmail(userData.contactEmail || "");
             setOriginalPhone(userData.phone || "");
             setOriginalProfilePic(userData.profilePic || null);
+            setOriginalAboutInfo(userData.aboutInfo || "")
         })
       .catch(() => setError("Failed to fetch user details."));
   }, []);
@@ -89,6 +93,7 @@ export default function OrgProfile() {
       formData.append("email", email);
       formData.append("contactEmail", contactEmail);
       formData.append("phone", phone);
+      formData.append("aboutInfo", aboutInfo);
       if (profilePicFile) {
         formData.append("profilePic", profilePicFile);
       } else if (!profilePicUrl) {
@@ -125,6 +130,7 @@ export default function OrgProfile() {
     email !== originalEmail ||
     contactEmail !== originalContactEmail ||
     phone !== originalPhone ||
+    aboutInfo !== originalAboutInfo ||
     profilePicFile !== null ||
     (!profilePicUrl && originalProfilePic); // removed existing image  
     
@@ -218,6 +224,15 @@ export default function OrgProfile() {
               onChange={(e) => setPhone(e.target.value)}
               className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium">About Us</label>
+            <textarea
+              value={aboutInfo}
+              onChange={(e)=> setAboutInfo(e.target.value)}
+              rows={5}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue">
+              </textarea>
           </div>
           <button
             type="submit"

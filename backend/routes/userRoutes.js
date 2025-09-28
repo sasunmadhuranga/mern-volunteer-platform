@@ -19,6 +19,18 @@ router.get("/me", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+// In your userRoutes.js or similar
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-passwordHash");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ user });
+  } catch (err) {
+    console.error("Error fetching user by ID:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Multer storage
 const storage = multer.diskStorage({
@@ -62,7 +74,7 @@ router.put(
   upload.single("profilePic"),
   async (req, res) => {
     try {
-      const { name, email, contactEmail, phone, birthday, gender, address, city, removeProfilePic } = req.body;
+      const { name, email, contactEmail, phone, aboutInfo, birthday, gender, address, city, removeProfilePic } = req.body;
       const user = await User.findById(req.user.id);
       if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -70,6 +82,7 @@ router.put(
       if (email) user.email = email;
       if (contactEmail !== undefined) user.contactEmail = contactEmail;
       if (phone !== undefined) user.phone = phone;
+      if (aboutInfo !== undefined) user.aboutInfo = aboutInfo;
       if (birthday !== undefined) user.birthday = birthday;
       if (gender !== undefined) user.gender = gender;
       if (address !== undefined) user.address = address;

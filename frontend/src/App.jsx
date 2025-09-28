@@ -14,6 +14,7 @@ import OrgManageEvents from './pages/orgadmin/OrgManageEvents';
 import EventVerification from './pages/admin/EventVerification';
 import EventsSection from './pages/volunteer/EventsSection';
 import VolunteerProfile from './pages/volunteer/VolunteerProfile';
+import EventRegistration from "./pages/volunteer/EventRegistration";
 export default function App() {
   return (
     <Router> 
@@ -56,6 +57,7 @@ export default function App() {
         >
           <Route path="eventsection" element={<EventsSection/>}/>
           <Route path="volunteerprofile" element={<VolunteerProfile/>}/>
+          <Route path="eventregistration/:eventId" element={<EventRegistration />} />
         </Route>
 
       </Routes>
