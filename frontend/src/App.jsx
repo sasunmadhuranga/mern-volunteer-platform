@@ -15,10 +15,14 @@ import EventVerification from './pages/admin/EventVerification';
 import EventsSection from './pages/volunteer/EventsSection';
 import VolunteerProfile from './pages/volunteer/VolunteerProfile';
 import EventRegistration from "./pages/volunteer/EventRegistration";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function App() {
   return (
     <Router> 
       <Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
         <Route path="/" element={<Landing/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/login" element={<Login/>}/>

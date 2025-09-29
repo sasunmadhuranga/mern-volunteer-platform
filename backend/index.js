@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/userRoutes.js';
 import eventRoutes from "./routes/eventRoutes.js";
+import eventApplicationRoutes from "./routes/eventApplicationRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -18,6 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 app.use("/api/events", eventRoutes);
+app.use("/api/event-applications", eventApplicationRoutes)
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
