@@ -14,6 +14,7 @@ const eventSchema = new mongoose.Schema(
     maxAge: { type: Number, required: true, min: 18 },
     description: { type: String, required: true, trim: true },
     qualification: { type: String, required: true, trim: true },
+    qualificationType: { type: String, required: function() {return this.qualification === "Required"}, trim: true },
     minDay: { type: Number, required: true, min: 0 },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     status: {

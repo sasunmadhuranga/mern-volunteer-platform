@@ -21,12 +21,16 @@ router.post("/add", authenticateToken, async (req, res) => {
       maxAge,
       description,
       qualification,
+      qualificationType,
       minDay,
     } = req.body;
 
     // ✅ basic validation
     if (!eventType || !eventName || !institute || !location || !city || !startDate || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "All required fields must be filled" });
+    }
+    if (qualification === "Required" && !qualificationType) {
+      return res.status(400).json({ message: "Qualification type is required when qualification is 'Required'" });
     }
 
     // ✅ create event
@@ -43,6 +47,7 @@ router.post("/add", authenticateToken, async (req, res) => {
       maxAge,
       description,
       qualification,
+      qualificationType,
       minDay,
       createdBy: req.user.id, // org id
     });
@@ -122,6 +127,7 @@ router.get("/search", authenticateToken, async (req, res) => {
       maxAge: event.maxAge,
       description: event.description,
       qualification: event.qualification,
+      qualificationType: event.qualificationType,
       minDay: event.minDay,
       status: event.status,
       organizerId: event.createdBy._id.toString(),  // this is what frontend expects

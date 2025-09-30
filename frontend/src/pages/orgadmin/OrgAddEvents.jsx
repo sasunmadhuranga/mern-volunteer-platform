@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import { toast } from "react-toastify";
 export default function OrgEvents() {
   const [eventType, setEventType] = useState("");
   const [showForm, setShowForm] = useState(false); 
@@ -9,6 +9,7 @@ export default function OrgEvents() {
   const [location, setLocation] = useState("");
   const [city, setCity] = useState("");
   const [qualification, setQualification] = useState("");
+  const [qualificationType, setQualificationType] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [opportunity, setOpportunity] = useState("");
@@ -17,7 +18,6 @@ export default function OrgEvents() {
   const [description, setDescription] = useState("");
   const [minDay, setMinDay] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const eventMeanings = {
     Community: "Engage with local communities to provide support and services.",
@@ -40,7 +40,6 @@ export default function OrgEvents() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
     if (endDate && new Date(startDate) > new Date(endDate)) {
       setError("End date cannot be before start date.");
@@ -73,6 +72,7 @@ export default function OrgEvents() {
           maxAge,
           description,
           qualification,
+          qualificationType: qualification === "Required" ? qualificationType : "",
           minDay,
         },
         {
@@ -83,10 +83,10 @@ export default function OrgEvents() {
       );
 
       if (res.status === 200) {
+        toast.success("Event created successfully!")
         console.log("New event ID:", res.data.id);
       }
 
-      setSuccess("Event created successfully!");
       setEventName("");
       setInstitute("");
       setLocation("");
@@ -275,6 +275,22 @@ export default function OrgEvents() {
               <option value="Not Required">Not Required</option>
             </select>
           </div>
+          {qualification === "Required" && (
+            <div>
+              <label className="block text-gray-700 font-medium">Type of Qualifications</label>
+              <select 
+              value={qualificationType} 
+              onChange={(e) => setQualificationType(e.target.value)}
+              className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select</option>
+                <option value="O/L">O/L</option>
+                <option value="A/L">A/L</option>
+                <option value="Diploma">Diploma</option>
+                <option value="Degree">Degree</option>
+              </select>
+          </div>
+          )}
           <div>
             <label className="block text-gray-700 font-medium">
               Min Work Days Needed for Certification
@@ -307,14 +323,7 @@ export default function OrgEvents() {
             </button>
           </div>
         </form>
-        {success && (
-          <p className="text-green-600 mt-4 font-medium text-center">
-            {success}
-          </p>
-        )}
-        {error && (
-          <p className="text-red-500 mt-4 font-medium text-center">{error}</p>
-        )}
+        
       </div>
     </div>
   );

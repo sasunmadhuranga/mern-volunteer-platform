@@ -20,9 +20,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   return (
+    <>
+    <ToastContainer position="top-right" autoClose={3000} />
     <Router> 
       <Routes>
-        <ToastContainer position="top-right" autoClose={3000} />
         <Route path="/" element={<Landing/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/login" element={<Login/>}/>
@@ -66,5 +67,6 @@ export default function App() {
 
       </Routes>
     </Router>
+    </>
   );
 }
