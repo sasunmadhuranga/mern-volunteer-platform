@@ -78,7 +78,7 @@ export default function AdminNavbar(){
           <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
             <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300">Profile</Link>
             <Link to="/volunteer/eventsection" className="hover:text-gray-300">Events</Link>
-            <Link to="volunteer/eventhistory" className="hover:text-gray-300">History</Link>
+            <Link to="/volunteer/eventhistory" className="hover:text-gray-300">History</Link>
             <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
           </div>
     
@@ -97,7 +97,7 @@ export default function AdminNavbar(){
               <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
                 <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
                 <Link to="/volunteer/eventsection" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Events</Link>
-                <Link to="volunteer/eventhistory" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>History</Link>
+                <Link to="/volunteer/eventhistory" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>History</Link>
                 <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
               </div>
             </div>

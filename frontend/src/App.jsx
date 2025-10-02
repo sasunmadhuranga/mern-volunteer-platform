@@ -15,6 +15,7 @@ import EventVerification from './pages/admin/EventVerification';
 import EventsSection from './pages/volunteer/EventsSection';
 import VolunteerProfile from './pages/volunteer/VolunteerProfile';
 import EventRegistration from "./pages/volunteer/EventRegistration";
+import EventHistory from "./pages/volunteer/EventHistory";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="eventsection" element={<EventsSection/>}/>
           <Route path="volunteerprofile" element={<VolunteerProfile/>}/>
           <Route path="eventregistration/:eventId" element={<EventRegistration />} />
+          <Route path="eventhistory" element={<EventHistory/>}/>
         </Route>
 
       </Routes>

@@ -19,7 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 app.use("/api/events", eventRoutes);
-app.use("/api/event-applications", eventApplicationRoutes)
+app.use("/api/event-applications", eventApplicationRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });

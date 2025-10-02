@@ -47,4 +47,22 @@ router.post('/', authenticateToken, upload.single('qualificationFile'), async (r
   }
 });
 
+// Get applications for the logged-in user
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    console.log("User ID from token:", req.user.id);
+    const applications = await EventApplication.find({ userId: req.user.id })
+      .populate('eventId')
+      .sort({ createdAt: -1 });
+    
+    console.log("Applications fetched:", applications.length);
+    res.json({ applications });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch applications" });
+  }
+});
+
+
+
 export default router;
