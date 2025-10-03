@@ -50,12 +50,10 @@ router.post('/', authenticateToken, upload.single('qualificationFile'), async (r
 // Get applications for the logged-in user
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    console.log("User ID from token:", req.user.id);
     const applications = await EventApplication.find({ userId: req.user.id })
       .populate('eventId')
       .sort({ createdAt: -1 });
     
-    console.log("Applications fetched:", applications.length);
     res.json({ applications });
   } catch (err) {
     console.error(err);
@@ -63,6 +61,51 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
+// PATCH /api/event-applications/:id/status → Update application status (e.g., cancel)
+router.patch('/:id/status', authenticateToken, async (req, res) => {
+  try {
+    const { status } = req.body;
 
+    if (!['cancelled', 'approved', 'rejected', 'pending'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const app = await EventApplication.findOne({
+      _id: req.params.id,
+      userId: req.user.id, // Ensure users can only modify their own applications
+    });
+
+    if (!app) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    app.status = status;
+    await app.save();
+
+    res.json({ message: `Application status updated to ${status}`, application: app });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update status' });
+  }
+});
+
+// DELETE /api/event-applications/:id → Delete application
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    const app = await EventApplication.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.id, // Prevent deleting other users' applications
+    });
+
+    if (!app) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    res.json({ message: 'Application deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete application' });
+  }
+});
 
 export default router;
