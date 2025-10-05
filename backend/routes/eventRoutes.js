@@ -140,5 +140,22 @@ router.get("/search", authenticateToken, async (req, res) => {
   }
 });
 
+// Get events created by the current ORG_ADMIN
+router.get("/org", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "ORG_ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const events = await Event.find({ createdBy: req.user.id }).select(
+      "eventType eventName location city startDate endDate status"
+    );
+
+    res.json({ success: true, data: events });
+  } catch (err) {
+    console.error("Error fetching ORG_ADMIN events:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 export default router;
