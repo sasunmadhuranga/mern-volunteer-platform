@@ -9,17 +9,32 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   const [startDate, setStartDate] = useState(initialValues.startDate ? initialValues.startDate.slice(0, 10) : "");
   const [endDate, setEndDate] = useState(initialValues.endDate ? initialValues.endDate.slice(0, 10) : "");
   const [opportunity, setOpportunity] = useState(initialValues.opportunity || 0);
-  const [minAge, setMinAge] = useState(initialValues.minAge || "");
-  const [maxAge, setMaxAge] = useState(initialValues.maxAge || "");
+  const [minAge, setMinAge] = useState(initialValues.minAge || 18);
+  const [maxAge, setMaxAge] = useState(initialValues.maxAge || 18);
   const [qualification, setQualification] = useState(initialValues.qualification || "");
   const [qualificationType, setQualificationType] = useState(initialValues.qualificationType || "");
   const [minDay, setMinDay] = useState(initialValues.minDay || 0);
   const [description, setDescription] = useState(initialValues.description || "");
-  const [error, setError] = useState("");
+
   // To reset maxAge if minAge changes
   useEffect(() => {
     if (maxAge < minAge) setMaxAge(minAge);
   }, [minAge, maxAge]);
+
+  if (endDate && new Date(startDate) > new Date(endDate)) {
+      setError("End date cannot be before start date.");
+      return;
+    }
+    if (minAge > maxAge) {
+      setError("Minimum age cannot be greater than maximum age.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Not authorized. Please login again.");
+      return;
+    }
 
   const handleSubmit = (e) => {
     e.preventDefault();

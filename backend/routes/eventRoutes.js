@@ -158,4 +158,87 @@ router.get("/org", authenticateToken, async (req, res) => {
   }
 });
 
+// Update Event (ORG_ADMIN only)
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "ORG_ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const {
+      eventName,
+      startDate,
+      endDate,
+      opportunity,
+      minAge,
+      maxAge,
+      description,
+      qualification,
+      qualificationType,
+      minDay,
+    } = req.body;
+
+    // Basic validation
+    if (!eventName || !startDate || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Fetch event to verify ownership
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (event.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You are not authorized to update this event" });
+    }
+
+    // Only update allowed fields
+    event.eventName = eventName;
+    event.startDate = startDate;
+    event.endDate = endDate;
+    event.opportunity = opportunity;
+    event.minAge = minAge;
+    event.maxAge = maxAge;
+    event.description = description;
+    event.qualification = qualification;
+    event.qualificationType = qualification === "Required" ? qualificationType : "";
+    event.minDay = minDay;
+
+    await event.save();
+    res.json({ message: "Event updated successfully", event });
+
+  } catch (err) {
+    console.error("Error updating event:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Delete Event (ORG_ADMIN only)
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "ORG_ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (event.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You are not authorized to delete this event" });
+    }
+
+    await event.deleteOne();  // or use `await Event.findByIdAndDelete(req.params.id);`
+    res.json({ message: "Event deleted successfully" });
+
+  } catch (err) {
+    console.error("Error deleting event:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 export default router;
