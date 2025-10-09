@@ -240,5 +240,25 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// Get single event by ID (for edit form)
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Optional: Check if user is the creator (ORG_ADMIN only)
+    if (req.user.role === "ORG_ADMIN" && event.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You are not authorized to view this event" });
+    }
+
+    res.json({ success: true, data: event });
+  } catch (err) {
+    console.error("Error fetching event by ID:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 export default router;

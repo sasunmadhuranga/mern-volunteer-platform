@@ -15,7 +15,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   const [qualificationType, setQualificationType] = useState(initialValues.qualificationType || "");
   const [minDay, setMinDay] = useState(initialValues.minDay || 0);
   const [description, setDescription] = useState(initialValues.description || "");
-  const [error, setError] = useState("");
   // To reset maxAge if minAge changes
   useEffect(() => {
     if (maxAge < minAge) setMaxAge(minAge);
@@ -155,7 +154,7 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         <input
           type="number"
           value={maxAge}
-          min={minAge || 18}
+          min={minAge || ""}
           required
           onChange={(e) => setMaxAge(Number(e.target.value))}
           className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"

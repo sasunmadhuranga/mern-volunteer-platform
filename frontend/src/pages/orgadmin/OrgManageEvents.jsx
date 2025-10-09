@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 import EventForm from "../components/EventForm";
 import { toast } from "react-toastify";
+import ConfirmationModel from "../components/ConfirmationModel";
 
 export default function OrgManageEvents(){
   const [events, setEvents] = useState([]);
@@ -9,8 +10,9 @@ export default function OrgManageEvents(){
   const [error, setError] = useState("");
   const [showMenuId, setShowMenuId] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null); // 🔧 Track editing event
-  const [showEditFormId, setShowEditFormId] = useState(null); // 🔧 Which form to show
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deletingEventId, setdeletingEventId] = useState(null);
 
   useEffect(() => {
     fetchOrgEvents();
@@ -38,16 +40,27 @@ export default function OrgManageEvents(){
     setShowMenuId(prev => (prev === id ? null : id));
   };
 
-  const handleActionClick = (event, action) => {
+  const handleActionClick = async (event, action) => {
     if (action === "edit") {
-        setEditingEvent(event);
-        setShowEditFormId(event._id);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_BASE_URL}/api/events/${event._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setEditingEvent(res.data.data); // Use full event data
         setShowMenuId(null);
+      } catch (err) {
+        console.error("Failed to fetch full event data:", err);
+        toast.error("Failed to load event details.");
+      }
     } else if (action === "delete") {
-        handleDeleteEvent(event._id);
-        setShowMenuId(null);
+      setdeletingEventId(event._id);
+      setShowConfirm(true);
+      setShowMenuId(null);
     }
-    };
+  };
+
 
   const handleUpdateEvent = async (updatedData) => {
     try {
@@ -65,7 +78,6 @@ export default function OrgManageEvents(){
         toast.success("Event updated successfully");
         // Refresh event list
         fetchOrgEvents();
-        setShowEditFormId(null);
         setEditingEvent(null);
       }
     } catch (err) {
@@ -75,33 +87,40 @@ export default function OrgManageEvents(){
   };
 
   const handleCancelEdit = () => {
-    setShowEditFormId(null);
     setEditingEvent(null);
+    fetchOrgEvents();
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
-
+  const onConfirmDelete = async () => {
     try {
-        const token = localStorage.getItem("token");
-        if (!token) {
+      const token = localStorage.getItem("token");
+      if (!token) {
         toast.error("Not authorized.");
         return;
-        }
+      }
 
-        const res = await axios.delete(`${API_BASE_URL}/api/events/${eventId}`, {
+      const res = await axios.delete(`${API_BASE_URL}/api/events/${deletingEventId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        });
+      });
 
-        if (res.status === 200) {
+      if (res.status === 200) {
         toast.success("Event deleted successfully");
         fetchOrgEvents(); // Refresh the event list
-        }
+      }
     } catch (err) {
-        console.error("Failed to delete event:", err);
-        toast.error("Failed to delete event");
+      console.error("Failed to delete event:", err);
+      toast.error("Failed to delete event");
+    } finally {
+      setShowConfirm(false);
+      setdeletingEventId(null);
     }
-    };
+  };
+
+
+  const onCancelDelete = () => {
+    setShowConfirm(false);
+    setdeletingEventId(null);
+  }
 
 
   useEffect(() => {
@@ -120,7 +139,7 @@ export default function OrgManageEvents(){
 return (
   <div className="flex justify-center items-center bg-sky-100 px-4 py-12 md:px-20 lg:px-40">
     <div className="w-full max-w-5xl relative">
-      <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">Events Published</h1>
+      <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">{editingEvent ? "Edit Event" : "Events Published"}</h1>
 
       {/* ✅ Show Edit Form if editing */}
       {editingEvent ? (
@@ -157,6 +176,7 @@ return (
                 >
                   <div className="absolute top-3 right-3">
                     <button
+                      disabled={!!editingEvent}
                       onClick={() => handleMenuToggle(event._id)}
                       className="menu-button text-gray-600 hover:text-gray-800"
                     >
@@ -199,6 +219,13 @@ return (
         </>
       )}
     </div>
+    {showConfirm && 
+      (<ConfirmationModel
+        message="Are you sure you want to delete this event?"
+        onConfirm={onConfirmDelete}
+        onCancel={onCancelDelete}
+      />)
+    }
   </div>
 );
 

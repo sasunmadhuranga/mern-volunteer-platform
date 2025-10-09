@@ -7,6 +7,7 @@ export default function OrgEvents() {
   const [eventType, setEventType] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const eventMeanings = {
     Community: "Engage with local communities to provide support and services.",
@@ -61,7 +62,7 @@ export default function OrgEvents() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/events/add",
+        `${API_BASE_URL}/api/events/add`,
         {
           eventType, // passed from OrgEvents
           eventName,
