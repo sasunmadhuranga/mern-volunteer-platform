@@ -1,7 +1,7 @@
 export default function ConfirmationModel({message, onConfirm, onCancel}){
     return(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="flex flex-col bg-white relative w-[500px] rounded-xl overflow-hidden shadow-lg">
+            <div className="flex flex-col bg-white relative md:w-[500px] rounded-xl overflow-hidden shadow-lg px-10">
                 <p className="flex justify-center my-8">{message}</p>
                 <div className="flex border-t border-gray-200">
                     <button 
