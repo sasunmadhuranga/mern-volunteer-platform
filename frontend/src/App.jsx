@@ -9,7 +9,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import OrgProfile from './pages/orgadmin/OrgProfile';
 import ProtectedRoute from "./pages/ProtectedRoute";
 import OrgAddEvents from './pages/orgadmin/OrgAddEvents';
-import OrgVerification from './pages/orgadmin/OrgVerification';
+import OrgManageApplications from './pages/orgadmin/OrgManageApplications';
 import OrgManageEvents from './pages/orgadmin/OrgManageEvents';
 import EventVerification from './pages/admin/EventVerification';
 import EventsSection from './pages/volunteer/EventsSection';
@@ -40,7 +40,7 @@ export default function App() {
           <Route path="profile" element={<OrgProfile />} />
           <Route path="addevents" element={<OrgAddEvents />} />
           <Route path="manageevents" element={<OrgManageEvents />} />
-          <Route path="verification" element={<OrgVerification />} />
+          <Route path="manageapplication" element={<OrgManageApplications/>} />
         </Route>
         
         <Route

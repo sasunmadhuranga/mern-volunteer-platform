@@ -108,4 +108,16 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /api/event-applications/event/:eventId
+router.get('/event/:eventId', authenticateToken, async (req, res) => {
+  try {
+    // Optional: verify that requester is ORG_ADMIN and owns the event
+    const applications = await EventApplication.find({ eventId: req.params.eventId })
+      .populate("userId", "name email");
+    res.json({ applications });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch applications" });
+  }
+});
+
 export default router;
