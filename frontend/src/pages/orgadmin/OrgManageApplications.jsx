@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import UserProfileDisplay from '../orgadmin/UserProfileDisplay';
 
 function OrgManageApplications() {
     const [events, setEvents] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState("");
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showUserDetails, setShowUserDetails] = useState(false);
+    const [userLoading, setUserLoading] = useState(false);
+    const [userDetails, setUserDetails] = useState(null);
+    const [userError, setUserError] = useState("");
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
     useEffect(() => {
@@ -65,6 +69,27 @@ function OrgManageApplications() {
         toast.error("Failed to update application status");
         }
     };
+    const handleClick = async (userId) => {
+        setShowUserDetails(true);
+        setUserLoading(true);
+        setUserError("");
+
+        try{
+            const token = localStorage.getItem("token");
+            const res = await axios.get(`${API_BASE_URL}/api/users/${userId}`, {
+                headers: {Authorization: `Bearer ${token}`},
+            })
+            setUserDetails(res.data.user);
+        }
+        catch(err){
+            console.log("Error fetching user details.", err);
+            setUserError("Failed to load user details.");
+            setUserDetails(null);
+        }
+        finally{
+            setUserLoading(false);
+        }
+    }
 
     return (
             <div className="bg-sky-100 px-4 py-12 md:px-20 lg:px-40 min-h-screen">
@@ -117,10 +142,17 @@ function OrgManageApplications() {
                             className="flex justify-between items-center border-b pb-2"
                         >
                             <div>
-                            <p className="text-lg font-medium text-gray-700">
-                                {index + 1}. {app.userId.name}
-                            </p>
-                            <p className="text-sm text-gray-600">Status: {app.status}</p>
+                                <div className="flex justify-between items-center">
+                                    <p>{index + 1}.</p>
+                                    <button 
+                                    onClick={() => handleClick(app.userId._id)} 
+                                    className="text-lg font-medium text-gray-700 hover:underline ml-1">
+                                        {app.userId.name}
+                                    </button>
+
+                                </div>
+                            
+                            <p className="text-sm text-gray-600 ml-4">Status: {app.status}</p>
                             </div>
                             <div className="space-y-2 space-x-2">
                             {app.status === "pending" ? (
@@ -150,6 +182,16 @@ function OrgManageApplications() {
                     )}
                 </div>
                 </div>
+                {showUserDetails && (
+                    <div>
+                        <UserProfileDisplay
+                         onClose={() => setShowUserDetails(false)}
+                         loading={userLoading}
+                         error={userError}
+                         profile={userDetails}
+                        />
+                    </div>
+                )}
             </div>
             );
 
