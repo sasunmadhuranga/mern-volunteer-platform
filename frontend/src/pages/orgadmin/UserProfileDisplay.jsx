@@ -33,11 +33,20 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
               <p><strong>Email:</strong> {profile.contactEmail || profile.email}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
+              {profile.qualificationFile && (
+                <p><strong>Qualification: {" "}</strong>
+                <a
+                  href={`${API_BASE_URL}${profile.qualificationFile}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800 "
+                >
+                  View Document
+                </a>
+                </p>
+              )}
             </div>
-            <div className="mt-4 text-gray-700">
-              <h3 className="font-semibold mb-2">About</h3>
-              <p>{profile.aboutInfo || "No additional information provided."}</p>
-            </div>
+            
           </>
         ) : (
           <p>No profile data available.</p>

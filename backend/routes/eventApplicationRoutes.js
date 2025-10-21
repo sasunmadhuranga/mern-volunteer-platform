@@ -3,6 +3,7 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 import multer from "multer";
 import EventApplication from '../models/EventApplication.js';
 import path from "path";
+import Event from "../models/Event.js";
 
 const router = express.Router();
 
@@ -70,13 +71,17 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Invalid status value' });
     }
 
-    const app = await EventApplication.findOne({
-      _id: req.params.id,
-      userId: req.user.id, // Ensure users can only modify their own applications
-    });
+    const app = await EventApplication.findOne({_id: req.params.id});
 
     if (!app) {
       return res.status(404).json({ error: 'Application not found' });
+    }
+
+    if (req.user.role === 'ORG_ADMIN') {
+      const event = await Event.findById(app.eventId);
+      if (!event || event.createdBy.toString() !== req.user.id) {
+        return res.status(403).json({ error: 'Not allowed to update application for this event' });
+      }
     }
 
     app.status = status;
