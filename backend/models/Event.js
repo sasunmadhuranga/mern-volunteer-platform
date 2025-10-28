@@ -8,6 +8,8 @@ const eventSchema = new mongoose.Schema(
     location: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true },
     startDate: { type: Date, required: true },
+    startTime: { type: String, required: true },
+    endTime: { type: String, required: true },
     endDate: { type: Date, required: true },
     opportunity: { type: Number, required: true, min: 1 },
     minAge: { type: Number, required: true, min: 18 },

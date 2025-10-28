@@ -7,6 +7,16 @@ export default function EventDetailsList({ event, handleProceed }) {
 
   if (!event) return null;
 
+  function formatTime(timeStr) {
+    if (!timeStr) return "";
+    const [hours, minutes] = timeStr.split(":");
+    const h = parseInt(hours);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  }
+
+
   return (
     <div className="w-full max-w-3xl p-6 rounded-xl shadow-lg bg-white relative">
       <div className="flex justify-between items-center mb-6">
@@ -41,6 +51,10 @@ export default function EventDetailsList({ event, handleProceed }) {
             day: "numeric",
             year: "numeric",
           })}
+        </p>
+        <p>
+          <strong>Daily Event Time:</strong>{" "}
+          {formatTime(event.startTime)} → {formatTime(event.endTime)}
         </p>
         <p><strong>Description:</strong></p>
         <p className="text-justify">{event.description}</p>

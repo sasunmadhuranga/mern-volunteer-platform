@@ -16,6 +16,8 @@ router.post("/add", authenticateToken, async (req, res) => {
       city,
       startDate,
       endDate,
+      startTime,
+      endTime,
       opportunity,
       minAge,
       maxAge,
@@ -26,7 +28,7 @@ router.post("/add", authenticateToken, async (req, res) => {
     } = req.body;
 
     // ✅ basic validation
-    if (!eventType || !eventName || !institute || !location || !city || !startDate || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
+    if (!eventType || !eventName || !institute || !location || !city || !startDate || !endDate || !startTime || !endTime || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
     if (qualification === "Required" && !qualificationType) {
@@ -42,6 +44,8 @@ router.post("/add", authenticateToken, async (req, res) => {
       city,
       startDate,
       endDate,
+      startTime,
+      endTime,
       opportunity,
       minAge,
       maxAge,
@@ -122,6 +126,8 @@ router.get("/search", authenticateToken, async (req, res) => {
       city: event.city,
       startDate: event.startDate,
       endDate: event.endDate,
+      startTime: event.startTime,
+      endTime: event.endTime,
       opportunity: event.opportunity,
       minAge: event.minAge,
       maxAge: event.maxAge,
@@ -169,6 +175,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
       eventName,
       startDate,
       endDate,
+      startTime,
+      endTime,
       opportunity,
       minAge,
       maxAge,
@@ -179,7 +187,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
     } = req.body;
 
     // Basic validation
-    if (!eventName || !startDate || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
+    if (!eventName || !startDate || !endTime || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -197,6 +205,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
     event.eventName = eventName;
     event.startDate = startDate;
     event.endDate = endDate;
+    event.startTime = startTime;
+    event.endTime = endTime;
     event.opportunity = opportunity;
     event.minAge = minAge;
     event.maxAge = maxAge;

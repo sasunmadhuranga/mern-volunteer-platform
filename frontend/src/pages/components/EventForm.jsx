@@ -8,6 +8,8 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   const [city, setCity] = useState(initialValues.city || "");
   const [startDate, setStartDate] = useState(initialValues.startDate ? initialValues.startDate.slice(0, 10) : "");
   const [endDate, setEndDate] = useState(initialValues.endDate ? initialValues.endDate.slice(0, 10) : "");
+  const [startTime, setStartTime] = useState(initialValues.startTime ? initialValues.startTime.slice(0, 10) : "");
+  const [endTime, setEndTime] = useState(initialValues.endTime ? initialValues.endTime.slice(0, 10) : "");
   const [opportunity, setOpportunity] = useState(initialValues.opportunity || 0);
   const [minAge, setMinAge] = useState(initialValues.minAge || "");
   const [maxAge, setMaxAge] = useState(initialValues.maxAge || "");
@@ -30,6 +32,8 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
       city,
       startDate,
       endDate,
+      startTime,
+      endTime,
       opportunity,
       minAge,
       maxAge,
@@ -118,6 +122,27 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={endDate}
           required
           onChange={(e) => setEndDate(e.target.value)}
+          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 font-medium">Daily Start Time</label>
+        <input
+          type="time"
+          value={startTime}
+          required
+          onChange={(e) => setStartTime(e.target.value)}
+          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-gray-700 font-medium">Daily End Time</label>
+        <input
+          type="time"
+          value={endTime}
+          required
+          onChange={(e) => setEndTime(e.target.value)}
           className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
