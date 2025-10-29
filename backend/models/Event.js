@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import crypto from 'crypto';
 const eventSchema = new mongoose.Schema(
   {
     eventType: { type: String, required: true, trim: true },
@@ -24,8 +24,17 @@ const eventSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected", "inactive"],
       default: "pending",
     },
+    attendanceToken: {type: String, unique: true},
   },
   { timestamps: true }
 );
+
+// Generate unique token before save
+eventSchema.pre("save", function (next) {
+  if (!this.attendanceToken) {
+    this.attendanceToken = crypto.randomBytes(16).toString("hex");
+  }
+  next();
+});
 
 export default mongoose.model("Event", eventSchema);

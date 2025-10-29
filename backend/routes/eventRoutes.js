@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import Event from "../models/Event.js";  // <-- make sure Event model exists
-
+import QRCode from 'qrcode';
 
 const router = express.Router();
 
@@ -267,6 +267,25 @@ router.get("/:id", authenticateToken, async (req, res) => {
     res.json({ success: true, data: event });
   } catch (err) {
     console.error("Error fetching event by ID:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Generate and return QR code for an event
+router.get("/:id/qr", authenticateToken, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    // Generate attendance URL for QR
+    const attendanceURL = `http://localhost:5000/api/events/attendance/${event._id}?token=${event.attendanceToken}`;
+
+    // Create QR code as data URL (base64)
+    const qrCodeDataURL = await QRCode.toDataURL(attendanceURL);
+
+    res.json({ qrCodeDataURL });
+  } catch (err) {
+    console.error("QR generation failed:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
