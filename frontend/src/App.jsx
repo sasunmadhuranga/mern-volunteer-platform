@@ -18,7 +18,8 @@ import EventRegistration from "./pages/volunteer/EventRegistration";
 import EventHistory from "./pages/volunteer/EventHistory";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import OrgContent from './pages/orgadmin/OrgContent';
+import AdminDashboardStats from "./pages/admin/AdminDashboardStats";
 export default function App() {
   return (
     <>
@@ -37,6 +38,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
+          <Route index element={<OrgContent />} />
           <Route path="profile" element={<OrgProfile />} />
           <Route path="addevents" element={<OrgAddEvents />} />
           <Route path="manageevents" element={<OrgManageEvents />} />
@@ -51,6 +53,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
+          <Route index element={<AdminDashboardStats/>}/>
           <Route path="eventverification" element={<EventVerification/>}/>
         </Route>
         <Route

@@ -55,6 +55,7 @@ export default function AdminNavbar(){
                 <img src="/images/profilePic.jpg" alt="Profile" className="w-14 h-14 rounded-full object-cover border flex-shrink-0"/>
             </div>
             <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
+                <Link to="/admin" className="hover:text-gray-300">Dashboard</Link>
                 <Link to="/admin/eventverification" className="hover:text-gray-300">Events</Link>
                 <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
             </div>
@@ -67,6 +68,7 @@ export default function AdminNavbar(){
             {menuOpen && (
                 <div className="absolute top-full left-0 w-full bg-blue-700 shadow-md md:hidden animate-slide-down z-40">
                 <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
+                    <Link to="/admin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Dashboard</Link>
                     <Link to="/admin/eventverification" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Events</Link>
                     <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
                 </div>

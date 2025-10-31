@@ -72,6 +72,7 @@ export default function OrgNavbar() {
 
       {/* Desktop Nav Links */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
+        <Link to="/org" className="hover:text-gray-300">Dashboard</Link>
         <Link to="/org/profile" className="hover:text-gray-300">Profile</Link>
         <Link to="/org/addevents" className="hover:text-gray-300">Add Events</Link>
         <Link to="/org/manageevents" className="hover:text-gray-300">Manage Events</Link>
@@ -92,6 +93,7 @@ export default function OrgNavbar() {
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-700 shadow-md md:hidden animate-slide-down z-40">
           <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
+            <Link to="/org" className="hover:text-gray-300" onClick={() => setMenuOpen(false) }>Dashboard</Link>
             <Link to="/org/profile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
             <Link to="/org/addevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Add Events</Link>
             <Link to="/org/manageevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Events</Link>
