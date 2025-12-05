@@ -84,7 +84,7 @@ export default function OrgContent() {
       {/* QR Codes */}
       <h2 className="text-2xl font-bold text-sky-800 mb-4 text-center">Attendance QR Codes</h2>
       {events.length === 0 ? (
-        <p className="text-gray-500">No events available for QR codes.</p>
+        <p className="text-gray-500">No events available.</p>
       ) : (
         <div className="flex space-x-4 overflow-x-auto pb-4">
           {events.map((event) => (
@@ -104,20 +104,31 @@ function QRCodeCard({ event }) {
     const fetchQR = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/events/${event._id}/qr`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const today = new Date().toISOString().split("T")[0];
+
+        const res = await axios.get(
+          `${API_BASE_URL}/api/events/${event._id}/qr?date=${today}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         setQr(res.data.qrCodeDataURL);
       } catch (err) {
         console.error(`Failed to fetch QR for event ${event.eventName}:`, err);
       }
     };
+
     fetchQR();
   }, [event._id, event.eventName]);
 
   return (
     <div className="flex-shrink-0 bg-white rounded-lg shadow-md p-4 w-64 text-center">
       <h3 className="font-semibold mb-2">{event.eventName}</h3>
+      <p className="text-sm text-sky-600 mb-2">
+        Today's QR ({new Date().toISOString().split("T")[0]})
+      </p>
+
       {qr ? (
         <img src={qr} alt={`QR code for ${event.eventName}`} className="w-56 h-56 mx-auto" />
       ) : (
