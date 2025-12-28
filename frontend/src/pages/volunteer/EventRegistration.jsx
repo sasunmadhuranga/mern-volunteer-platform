@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import EventDetailsList from '../components/EventDetailsList';
+import { useUser } from "../../context/UserContext";
 export default function EventRegistration() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function EventRegistration() {
   const [showApplication, setShowApplication] = useState(false);
   const [qualificationFile, setQualificationFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const { user} = useUser();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -25,23 +27,13 @@ export default function EventRegistration() {
   }, [event, navigate]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if(!token){
-        setError("No token found. Please log in again")
-        return;
+    if (user) {
+        setName(user.name);
+        setBirthday(user.birthday);
+        setContactEmail(user.contactEmail);
+        setPhone(user.phone);
     }
-    axios.get(`${API_BASE_URL}/api/users/me`, {
-            headers: {Authorization: `Bearer ${token}`},
-        })
-        .then((res) => {
-            const userData = res.data.user; 
-            setName(userData.name);
-            setBirthday(userData.birthday);
-            setContactEmail(userData.contactEmail);
-            setPhone(userData.phone);
-        })
-        .catch(() => setError("Failed to fetch user details."))
-  }, [API_BASE_URL])
+    }, [user]);
 
   if (!event) return null;
 

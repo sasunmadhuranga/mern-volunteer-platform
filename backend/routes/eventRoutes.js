@@ -2,6 +2,7 @@ import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import Event from "../models/Event.js";  // <-- make sure Event model exists
 import QRCode from 'qrcode';
+import * as crypto from 'crypto';
 
 const router = express.Router();
 
@@ -271,23 +272,72 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Generate and return QR code for an event
-router.get("/:id/qr", authenticateToken, async (req, res) => {
+const normalizeDateKey = (d) => {
+  return new Date(d).toISOString().split("T")[0];
+};
+
+router.get("/:eventId/qr/:date", authenticateToken, async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    const { eventId, date } = req.params;
 
-    // Generate attendance URL for QR
-    const attendanceURL = `http://localhost:5000/api/events/attendance/${event._id}?token=${event.attendanceToken}`;
+    // Validate date format first
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
 
-    // Create QR code as data URL (base64)
-    const qrCodeDataURL = await QRCode.toDataURL(attendanceURL);
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-    res.json({ qrCodeDataURL });
+    // Normalize dates (date-only comparison)
+    const dateKey = date;
+    const startKey = event.startDate.toISOString().slice(0, 10);
+    const endKey = event.endDate.toISOString().slice(0, 10);
+
+    if (dateKey < startKey || dateKey > endKey) {
+      return res.status(403).json({
+        message: "QR not valid outside event date range"
+      });
+    }
+
+    // Ensure Map
+    if (!(event.dailyTokens instanceof Map)) {
+      event.dailyTokens = new Map(Object.entries(event.dailyTokens || {}));
+    }
+
+    let token = event.dailyTokens.get(dateKey);
+
+    if (!token) {
+      token = crypto.randomBytes(32).toString("hex");
+      event.dailyTokens.set(dateKey, token);
+      await event.save(); // save ONCE
+    }
+
+    const scanType = req.query.type; // "check-in" or "check-out"
+
+    if (!["check-in", "check-out"].includes(scanType)) {
+      return res.status(400).json({ message: "Invalid scan type" });
+    }
+
+    const qrPayload = JSON.stringify({
+      eventId: event._id,
+      date,
+      token,
+      scanType
+    });
+
+
+    const qrImage = await QRCode.toDataURL(qrPayload);
+
+    res.json({ qrImage });
+
   } catch (err) {
-    console.error("QR generation failed:", err);
+    console.error("QR generation error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 
 export default router;

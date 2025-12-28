@@ -77,6 +77,7 @@ export default function OrgNavbar() {
         <Link to="/org/addevents" className="hover:text-gray-300">Add Events</Link>
         <Link to="/org/manageevents" className="hover:text-gray-300">Manage Events</Link>
         <Link to="/org/manageapplication" className="hover:text-gray-300">Manage Application</Link>
+        <Link to="/org/selecttemplate" className="hover:text-gray-300">Template</Link>
         <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
       </div>
 
@@ -98,6 +99,7 @@ export default function OrgNavbar() {
             <Link to="/org/addevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Add Events</Link>
             <Link to="/org/manageevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Events</Link>
             <Link to="/org/manageapplication" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Application</Link>
+            <Link to="/org/selecttemplate" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Template</Link>
             <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
           </div>
         </div>

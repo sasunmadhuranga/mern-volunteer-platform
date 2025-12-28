@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { useUser } from "../context/UserContext";
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -9,19 +9,19 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const navigate = useNavigate();
-
+  const { setUser, setToken } = useUser(); // grab setToken from context
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -31,18 +31,19 @@ export default function Login() {
         setMessage("Login successful!");
         setMessageType("success");
 
-        // Save token and user data (for authentication/role-based redirects)
+        // Save token and user data in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
+        // Update context
+        setUser(data.user);
+        setToken(data.token); // ✅ update context token too
+
         // Redirect based on role
-        if (data.user.role === "ADMIN") {
-          navigate("/admin/dashboard");
-        } else if (data.user.role === "ORG_ADMIN") {
-          navigate("/org/dashboard");
-        } else {
-          navigate("/volunteer/dashboard");
-        }
+        if (data.user.role === "ADMIN") navigate("/admin", { replace: true });
+        else if (data.user.role === "ORG_ADMIN") navigate("/org", {replace: true});
+        else navigate("/volunteer");
+
       } else {
         setMessage(data.message || "Invalid credentials.");
         setMessageType("error");
@@ -53,6 +54,7 @@ export default function Login() {
       setMessageType("error");
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -99,10 +101,19 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center mt-4">
+        <p className="text-center mt-4 text-sm text-gray-700">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-blue-500 font-bold hover:underline">
+          <Link to="/signup" className="text-blue-500 font-semibold hover:underline">
             Sign up
+          </Link>
+        </p>
+
+        <p className="text-center mt-2">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Forgot password?
           </Link>
         </p>
       </div>

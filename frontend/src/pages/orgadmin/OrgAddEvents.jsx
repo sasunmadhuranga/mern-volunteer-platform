@@ -7,6 +7,7 @@ export default function OrgEvents() {
   const [eventType, setEventType] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
+  const [qrData, setQrData] = useState(null);
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const eventMeanings = {

@@ -8,84 +8,155 @@ const router = express.Router();
 
 router.post("/scan", authenticateToken, async (req, res) => {
   try {
-    const { eventId, date, token } = req.body;
+    const { eventId, date, token, scanType } = req.body; // frontend no longer decides
     const volunteerId = req.user.id;
 
-    // Find event
+    // Validate scanType
+    if (!["check-in", "check-out"].includes(scanType)) {
+      return res.status(400).json({ message: "Invalid scan type" });
+    }
+
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    // ---- FIXED: Correct token retrieval ----
-    const correctToken = event.dailyTokens[date];
+    // Convert dailyTokens to Map if needed
+    if (!(event.dailyTokens instanceof Map)) {
+      event.dailyTokens = new Map(Object.entries(event.dailyTokens || {}));
+    }
+
+    const correctToken = event.dailyTokens.get(date);
     if (!correctToken || token !== correctToken) {
       return res.status(400).json({ message: "Invalid or expired QR code" });
     }
 
-    // Validate date range
+    // Validate event date
     const scanDate = new Date(date);
     if (scanDate < event.startDate || scanDate > event.endDate) {
-      return res.status(403).json({ message: "QR code is not valid for this day" });
+      return res.status(403).json({ message: "QR code not valid for this day" });
     }
 
-    // Validate time range
+    // Validate event time
     const now = new Date();
-    const eventStart = new Date(date + "T" + event.startTime);
-    const eventEnd = new Date(date + "T" + event.endTime);
+    const eventStart = new Date(`${date}T${event.startTime}`);
+    const eventEnd = new Date(`${date}T${event.endTime}`);
 
     if (now < eventStart || now > eventEnd) {
-      return res.status(403).json({ message: "QR code scan is outside event time" });
+      return res.status(403).json({ message: "QR scan is outside event time" });
     }
 
-    // Approvals check
+    // Check if volunteer is approved
     const application = await EventApplication.findOne({
       userId: volunteerId,
       eventId,
       status: "approved",
     });
-
     if (!application) {
-      return res.status(403).json({
-        message: "You are not approved for this event",
-      });
+      return res.status(403).json({ message: "You are not approved for this event" });
     }
 
-    // Check if user already checked in/out today
-    const existing = await Attendance.findOne({ eventId, volunteerId, date });
+    let attendance = await Attendance.findOne({ eventId, volunteerId, date });
 
-    let scanType = "check-in";
-
-    if (!existing) {
-      // First scan → check-in
-      scanType = "check-in";
-    } else {
-      if (existing.scanType === "check-out") {
-        return res.status(400).json({ message: "You already checked out today" });
+    // Handle check-in
+    if (scanType === "check-in") {
+      if (attendance?.checkInTime) {
+        return res.status(400).json({ message: "Already checked in today" });
       }
-      // Second scan → check-out
-      scanType = "check-out";
+
+      if (!attendance) {
+        attendance = await Attendance.create({
+          eventId,
+          volunteerId,
+          eventApplicationId: application._id,
+          date,
+          checkInTime: now,
+        });
+      } else {
+        attendance.checkInTime = now;
+        await attendance.save();
+      }
+
+      return res.json({ message: "Checked in successfully", attendance });
     }
 
-    const attendance = await Attendance.findOneAndUpdate(
-      { eventId, volunteerId, date },
-      {
-        eventId,
-        volunteerId,
-        eventApplicationId: application._id,
-        date,
-        scanType,
-        scanTime: new Date(),
-      },
-      { upsert: true, new: true }
-    );
+    // Handle check-out
+    if (scanType === "check-out") {
+      if (!attendance?.checkInTime) {
+        return res.status(400).json({ message: "Cannot check out before checking in" });
+      }
+      if (attendance.checkOutTime) {
+        return res.status(400).json({ message: "Already checked out today" });
+      }
 
-    return res.json({
-      message: `Successfully recorded ${scanType}`,
-      attendance,
-    });
+      attendance.checkOutTime = now;
+      await attendance.save();
+      return res.json({ message: "Checked out successfully", attendance });
+    }
 
   } catch (err) {
     console.error("Attendance scan error:", err);
     return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+router.get("/history", authenticateToken, async (req, res) => {
+  try {
+    const volunteerId = req.user.id;
+
+    const records = await Attendance.find({ volunteerId })
+      .populate("eventId", "eventName")
+      .sort({ date: -1 });
+
+    res.json({ history: records });
+  } catch (err) {
+    console.error("Attendance history error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/history/grouped", authenticateToken, async (req, res) => {
+  try {
+    const volunteerId = req.user.id;
+
+    const records = await Attendance.find({ volunteerId })
+      .populate("eventId", "eventName")
+      .sort({ date: 1 }); // oldest → newest
+
+    const grouped = {};
+
+    records.forEach(rec => {
+      const eventName = rec.eventId?.eventName || "Unknown Event";
+
+      if (!grouped[eventName]) {
+        grouped[eventName] = [];
+      }
+
+      grouped[eventName].push({
+        date: rec.date,
+        checkInTime: rec.checkInTime,
+        checkOutTime: rec.checkOutTime
+      });
+    });
+
+    res.json({ history: grouped });
+  } catch (err) {
+    console.error("Attendance history error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/history/:eventId", authenticateToken, async (req, res) => {
+  try {
+    const volunteerId = req.user.id;
+    const eventId = req.params.eventId;
+
+    const records = await Attendance.find({ volunteerId, eventId })
+      .sort({ date: -1 });
+
+    res.json({ eventId, history: records });
+  } catch (err) {
+    console.error("History by event error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

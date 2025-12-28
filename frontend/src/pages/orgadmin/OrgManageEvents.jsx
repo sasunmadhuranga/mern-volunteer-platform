@@ -28,7 +28,10 @@ export default function OrgManageEvents(){
       const res = await axios.get(`${API_BASE_URL}/api/events/org`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEvents(res.data.data);
+      const sortedEvents = res.data.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setEvents(sortedEvents);
     } catch (err) {
       console.error("Failed to fetch org events:", err);
     } finally {

@@ -12,3 +12,20 @@ export const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+export const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Admin access required.' });
+  }
+  next();
+};
+
+// Organization admins (or super admins)
+export const isOrgAdmin = (req, res, next) => {
+  if (req.user.role !== 'ORG_ADMIN' && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Org admin access required.' });
+  }
+  next();
+};
+
+

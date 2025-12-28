@@ -1,128 +1,169 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import AttendanceScanner from "../components/AttendanceScanner";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-export default function OrgContent() {
-  const [stats, setStats] = useState({
-    totalEvents: 0,
-    activeEvents: 0,
-    totalApplications: 0,
-  });
-  const [events, setEvents] = useState([]);
 
+export default function AttendanceUI() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [attendanceStatus, setAttendanceStatus] = useState({});
+  const [scannerEvent, setScannerEvent] = useState(null);
+  const navigate = useNavigate();
+
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Colombo",
+  });
+
+  // Fetch approved events
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchEvents() {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
 
-        // Fetch all events created by this org admin
-        const eventsRes = await axios.get(`${API_BASE_URL}/api/events/org`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${API_BASE_URL}/api/event-applications/me`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        const eventsData = eventsRes.data.data || [];
-        setEvents(eventsData);
+        const approved = (res.data.applications || []).filter(
+          (app) => app.status === "approved"
+        );
 
-        const today = new Date();
-        const activeEvents = eventsData.filter(
-          (event) => new Date(event.endDate) >= today
-        ).length;
-
-        // Fetch total applications
-        let totalApplications = 0;
-        for (const event of eventsData) {
-          const appsRes = await axios.get(
-            `${API_BASE_URL}/api/event-applications/event/${event._id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          totalApplications += appsRes.data.applications.length;
-        }
-
-        setStats({
-          totalEvents: eventsData.length,
-          activeEvents,
-          totalApplications,
-        });
+        setEvents(approved);
       } catch (err) {
-        console.error("Failed to fetch org stats:", err);
+        toast.error("Failed to fetch events");
+      } finally {
+        setLoading(false);
       }
     }
 
-    fetchStats();
+    fetchEvents();
   }, []);
 
-  const cardClass =
-    "w-full md:w-72 md:h-28 p-4 rounded-lg shadow-lg flex flex-col justify-center items-center text-white";
+  const handleScannerComplete = (message) => {
+    if (scannerEvent) {
+      setAttendanceStatus((prev) => ({
+        ...prev,
+        [scannerEvent.eventId]: message,
+      }));
+    }
+    setScannerEvent(null);
+  };
 
-  return (
-    <div className="p-6 space-y-8">
-      {/* Stats Cards */}
-      <div className="flex flex-col md:flex-row md:justify-center md:space-x-6 space-y-4 md:space-y-0">
-        <div
-          className={`${cardClass} bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500`}
-        >
-          <h2 className="text-xl font-bold">Total Events</h2>
-          <p className="text-3xl font-extrabold">{stats.totalEvents}</p>
-        </div>
-        <div
-          className={`${cardClass} bg-gradient-to-r from-green-500 via-teal-500 to-cyan-500`}
-        >
-          <h2 className="text-xl font-bold">Active Events</h2>
-          <p className="text-3xl font-extrabold">{stats.activeEvents}</p>
-        </div>
-        <div
-          className={`${cardClass} bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500`}
-        >
-          <h2 className="text-xl font-bold">Applications</h2>
-          <p className="text-3xl font-extrabold">{stats.totalApplications}</p>
-        </div>
+  // Loading
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full" />
       </div>
+    );
+  }
 
-      {/* QR Codes */}
-      <h2 className="text-2xl font-bold text-sky-800 mb-4 text-center">Attendance QR Codes</h2>
-      {events.length === 0 ? (
-        <p className="text-gray-500">No events available for QR codes.</p>
-      ) : (
-        <div className="flex space-x-4 overflow-x-auto pb-4">
-          {events.map((event) => (
-            <QRCodeCard key={event._id} event={event} />
-          ))}
+  // Scanner View
+  if (scannerEvent) {
+    return (
+      <AttendanceScanner
+        eventId={scannerEvent.eventId}
+        eventName={scannerEvent.eventName}
+        action={scannerEvent.action}
+        onComplete={handleScannerComplete}
+      />
+    );
+  }
+  
+    return(
+        <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
+            <div className="w-full max-w-3xl mx-auto space-y-4">
+                {events.map((app) => {
+                const event = app.eventId;
+                const now = new Date();
+                const start = new Date(event.startDate);
+                const end = new Date(event.endDate);
+
+                const hasStarted = now >= start;
+                const hasEnded = now > end;
+                const todayWithinEvent = now >= start && now <= end;
+                
+                return (
+                    <div
+                    key={event._id}
+                    className="w-full border rounded-xl p-4 shadow-sm bg-white mb-8"
+                    >
+                    <h2 className="text-center text-lg font-bold text-blue-600">
+                        {event.eventName}
+                    </h2>
+
+                    <p className="text-sm text-gray-600">
+                        {new Date(event.startDate).toLocaleDateString()} →{" "}
+                        {new Date(event.endDate).toLocaleDateString()}
+                    </p>
+
+                    {todayWithinEvent && (
+                        <p className="text-sm mt-1 font-medium">
+                        Today: {today}
+                        </p>
+                    )}
+
+                    {hasStarted && !hasEnded && (
+                        <div className="flex gap-3 mt-4">
+                        <button
+                            className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-semibold"
+                            onClick={() =>
+                            setScannerEvent({
+                                eventId: event._id,
+                                eventName: event.eventName,
+                                action: "check-in",
+                            })
+                            }
+                        >
+                            Check-In
+                        </button>
+
+                        <button
+                            className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold"
+                            onClick={() =>
+                            setScannerEvent({
+                                eventId: event._id,
+                                eventName: event.eventName,
+                                action: "check-out",
+                            })
+                            }
+                        >
+                            Check-Out
+                        </button>
+                        </div>
+                    )}
+
+                    {hasStarted && (
+                        <button
+                        className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold"
+                        onClick={() =>
+                            navigate("/volunteer/attendance-history", {
+                            state: {
+                                eventId: event._id,
+                                eventName: event.eventName,
+                            },
+                            })
+                        }
+                        >
+                        View Attendance History
+                        </button>
+                    )}
+
+                    {attendanceStatus[event._id] && (
+                        <p className="mt-2 italic text-sm text-gray-600">
+                        {attendanceStatus[event._id]}
+                        </p>
+                    )}
+                    </div>
+                );
+                })}
+            </div>
         </div>
-      )}
-    </div>
-  );
-}
-
-// Separate QR Code Card Component
-function QRCodeCard({ event }) {
-  const [qr, setQr] = useState("");
-
-  useEffect(() => {
-    const fetchQR = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/events/${event._id}/qr`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setQr(res.data.qrCodeDataURL);
-      } catch (err) {
-        console.error(`Failed to fetch QR for event ${event.eventName}:`, err);
-      }
-    };
-    fetchQR();
-  }, [event._id, event.eventName]);
-
-  return (
-    <div className="flex-shrink-0 bg-white rounded-lg shadow-md p-4 w-64 text-center">
-      <h3 className="font-semibold mb-2">{event.eventName}</h3>
-      {qr ? (
-        <img src={qr} alt={`QR code for ${event.eventName}`} className="w-56 h-56 mx-auto" />
-      ) : (
-        <p className="text-gray-400">Loading QR...</p>
-      )}
-    </div>
-  );
+    );
 }

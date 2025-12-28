@@ -8,6 +8,7 @@ export default function AdminEventVerification() {
   const [showModel, setShowModel] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,7 +21,12 @@ export default function AdminEventVerification() {
       .get(`${API_BASE_URL}/api/events/all`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setEvents(res.data))
+      .then((res) => {
+        const sorted = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setEvents(sorted)
+      })
       .catch(() => setError("Failed to load events."));
   }, [API_BASE_URL]);
 
@@ -55,15 +61,30 @@ export default function AdminEventVerification() {
   }
   if (error) return <p className="text-red-600">{error}</p>;
   
+  const filterEvents = events.filter(event => {
+    if(filterStatus === "all") return true;
+    return event.status === filterStatus;
+  });
 return (
     <div className="md:px-20 lg:px-40 py-8">
         <h2 className="text-3xl font-bold text-center text-sky-800 mb-8">Event Verification</h2>
-
-        {events.length === 0 ? (
+        <div className="flex justify-end mb-6">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+            <option value="all">All</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="pending">Pending</option>
+            </select>
+        </div>
+        {filterEvents.length === 0 ? (
             <p className="text-center text-gray-500">No events found.</p>
         ) : (
             <div className="space-y-6">
-                {events.map(event => (
+                {filterEvents.map(event => (
                     <div 
                         key={event._id}
                         className="bg-white rounded-xl shadow-lg p-10 transition hover:shadow-xl"

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import OrgProfileDisplay from "./OrgProfileDisplay";
-import { useLocation } from "react-router-dom";
 import EventList from "../components/EventList";
+
 export default function EventsSection() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [error, setError] = useState("");
@@ -14,25 +14,38 @@ export default function EventsSection() {
   const [orgProfile, setOrgProfile] = useState(null);
   const [orgLoading, setOrgLoading] = useState(false);
   const [orgError, setOrgError] = useState("");
-  const location = useLocation();
 
+  // Fetch all events on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("No token found. Please log in.");
-      return;
-    }
-    
+    const fetchEvents = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("No token found. Please log in.");
+          return;
+        }
+
+        const res = await axios.get(`${API_BASE_URL}/api/events/search`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setEvents(res.data); // store all events
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+        setError("Failed to load events.");
+      }
+    };
+
+    fetchEvents();
   }, [API_BASE_URL]);
 
+  // Handle search with filters
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return setError("No token found");
 
       const params = {};
-
-      // Add filters if they exist
       if (eventType) params.eventType = eventType;
       if (eventName) params.eventName = eventName;
       if (city) params.city = city;
@@ -42,61 +55,45 @@ export default function EventsSection() {
         params,
       });
 
-      setEvents(res.data);
+      setEvents(res.data); // override with search results
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch events.");
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("No token found. Please log in.");
-      return;
-    }
-
-    // If navigating back with search state
-    if (location.state?.filters && location.state?.results) {
-      const { filters, results } = location.state;
-      setEventType(filters.eventType || "");
-      setEventName(filters.eventName || "");
-      setCity(filters.city || "");
-      setEvents(results);
-      return; // skip fetching again
-    }
-
-    // Optionally fetch something else on first mount
-  }, [API_BASE_URL, location.state]);
-
-
   const handleClick = async (orgId) => {
     setShowOrgProfile(true);
     setOrgLoading(true);
     setOrgError("");
 
-    try{
+    try {
       const token = localStorage.getItem("token");
-      if(!token){
-        throw new Error("No token found");
-      }
+      if (!token) throw new Error("No token found");
+
       const res = await axios.get(`${API_BASE_URL}/api/users/${orgId}`, {
-        headers: {Authorization: `Bearer ${token}`},
-      })
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setOrgProfile(res.data.user);
-    }
-    catch(err){
+    } catch (err) {
       console.error("Error fetching org profile:", err);
       setOrgError("Failed to load organization profile.");
       setOrgProfile(null);
-    }finally{
+    } finally {
       setOrgLoading(false);
     }
-  }
+  };
+
   if (error) return <p className="text-red-600">{error}</p>;
+
+  // Filter future and ongoing events
+  const todayKey = new Date().toISOString().split("T")[0];
+  const upcomingEvents = events.filter((event) => event.endDate.split("T")[0] >= todayKey);
 
   return (
     <div className="flex flex-col items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
+      {/* Filter Section */}
       <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 md:w-auto w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 w-full">
           {/* Event Type */}
@@ -152,22 +149,22 @@ export default function EventsSection() {
         </div>
       </div>
 
+      {/* Event Cards */}
       <EventList
-        events={events}
-        handleOrgClick = {handleClick}
-        filters={{eventType, eventName, city}}
-        />
+        events={upcomingEvents}
+        handleOrgClick={handleClick}
+        filters={{ eventType, eventName, city }}
+      />
 
-        {showOrgProfile && 
-          <div>
-            <OrgProfileDisplay 
-            onClose= {() => setShowOrgProfile(false)}
-            loading = {orgLoading}
-            error = {orgError}
-            profile = {orgProfile}
-            />
-          </div>
-        }
+      {/* Org Profile Modal */}
+      {showOrgProfile && (
+        <OrgProfileDisplay
+          onClose={() => setShowOrgProfile(false)}
+          loading={orgLoading}
+          error={orgError}
+          profile={orgProfile}
+        />
+      )}
     </div>
   );
 }

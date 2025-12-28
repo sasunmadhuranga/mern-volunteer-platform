@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
   gender: {type: String, default: ""},
   address: {type: String, default: ""},
   city: {type: String, default: ""},
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
+
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

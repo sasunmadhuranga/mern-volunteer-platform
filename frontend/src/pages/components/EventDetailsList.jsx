@@ -61,7 +61,7 @@ export default function EventDetailsList({ event, handleProceed }) {
         <p><strong>Qualification:</strong> {event.qualification}</p>
         <p><strong>Qualified Age Range:</strong> {event.minAge} - {event.maxAge}</p>
 
-        <p className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
           <strong>Minimum Commitment Days:</strong>
           <span>{event.minDay}</span>
           <div className="relative group cursor-pointer">
@@ -81,7 +81,7 @@ export default function EventDetailsList({ event, handleProceed }) {
               {`To gain a certificate you have to work ${event.minDay} days, but you can volunteer for any number of days if you don't intend to gain a certificate.`}
             </div>
           </div>
-        </p>
+        </div>
 
         <p><strong>Total Opportunities:</strong> {event.opportunity}</p>
       </div>

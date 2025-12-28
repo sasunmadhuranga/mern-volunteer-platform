@@ -49,10 +49,13 @@ const eventSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔥 Generate daily tokens ONCE when the event is created
-eventSchema.pre("save", function (next) {
-  // Skip generation if dailyTokens already exists
-  if (this.dailyTokens && Object.keys(this.dailyTokens).length > 0) {
+// Generate daily tokens when event is created OR when dates change
+eventSchema.pre("validate", function (next) {
+  const startChanged = this.isModified("startDate");
+  const endChanged = this.isModified("endDate");
+
+  // If tokens already exist AND dates did not change → skip
+  if (!startChanged && !endChanged && this.dailyTokens && Object.keys(this.dailyTokens).length > 0) {
     return next();
   }
 
@@ -67,9 +70,7 @@ eventSchema.pre("save", function (next) {
   }
 
   this.dailyTokens = dayTokens;
-
   next();
 });
-
 
 export default mongoose.model("Event", eventSchema);

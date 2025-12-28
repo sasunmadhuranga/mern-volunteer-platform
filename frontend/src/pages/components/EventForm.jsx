@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function EventForm({ initialValues = {}, onSubmit, isEditMode = false }) {
   // Default values or from initialValues (editing)
@@ -17,11 +17,7 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   const [qualificationType, setQualificationType] = useState(initialValues.qualificationType || "");
   const [minDay, setMinDay] = useState(initialValues.minDay || 0);
   const [description, setDescription] = useState(initialValues.description || "");
-  // To reset maxAge if minAge changes
-  useEffect(() => {
-    if (maxAge < minAge) setMaxAge(minAge);
-  }, [minAge, maxAge]);
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pass the whole form data back to parent

@@ -103,7 +103,7 @@ export default function EventHistory() {
   return (
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
         <div className="w-full max-w-6xl p-3 relative">
-            <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">My Applied Events</h1>
+            <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">Applied Events</h1>
                 {applications.length === 0 ? (
                     <p className="text-center text-gray-600">You haven't applied to any events yet.</p>
                 ) : (

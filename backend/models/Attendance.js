@@ -7,13 +7,9 @@ const attendanceSchema = new mongoose.Schema(
     eventApplicationId: { type: mongoose.Schema.Types.ObjectId, ref: "EventApplication", required: true },
 
     date: { type: String, required: true }, // YYYY-MM-DD
-    time: { type: Date, default: Date.now },
+    checkInTime: { type: Date },
+    checkOutTime: { type: Date },
 
-    scanType: {
-      type: String,
-      enum: ["check-in", "check-out"],
-      default: "check-in",
-    },
   },
   { timestamps: true }
 );
