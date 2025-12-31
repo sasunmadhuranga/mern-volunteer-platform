@@ -84,14 +84,6 @@ export default function CertificateGenerator() {
                   <h3 className="text-lg font-semibold text-gray-800 mb-1">
                     {ev.eventName}
                   </h3>
-                  {ev.orgTemplate && (
-                    <p className="text-sm text-gray-500">
-                      Certificate Template:{" "}
-                      <span className="font-medium text-gray-700">
-                        {ev.orgTemplate.templateId.name}
-                      </span>
-                    </p>
-                  )}
                 </div>
 
                 {/* Action */}
