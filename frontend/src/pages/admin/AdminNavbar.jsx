@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaBars, FaTimes } from "react-icons/fa";
 
@@ -47,6 +47,7 @@ export default function AdminNavbar() {
     );
   }
 
+  const navClass = ({isActive}) => isActive ? "text-white border-b-2 border-white-300 pb-1" : "hover:text-gray-300";
   return (
     <div className="sticky top-0 z-50 bg-blue-700 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">
       <img
@@ -57,9 +58,9 @@ export default function AdminNavbar() {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
-        <Link to="/admin">Dashboard</Link>
-        <Link to="/admin/eventverification">Events</Link>
-        <Link to="/admin/templates">Templates</Link>
+        <NavLink to="/admin" end className={navClass}>Dashboard</NavLink>
+        <NavLink to="/admin/eventverification" end className={navClass}>Events</NavLink>
+        <NavLink to="/admin/templates" end className={navClass}>Templates</NavLink>
         <button onClick={handleLogout}>Logout</button>
       </div>
 
@@ -75,9 +76,9 @@ export default function AdminNavbar() {
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-700 md:hidden">
           <div className="flex flex-col items-center gap-4 py-4 text-gray-100">
-            <Link to="/admin" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-            <Link to="/admin/eventverification" onClick={() => setMenuOpen(false)}>Events</Link>
-            <Link to="/admin/templates" onClick={() => setMenuOpen(false)}>Templates</Link>
+            <NavLink to="/admin" end className={navClass} onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
+            <NavLink to="/admin/eventverification" end className={navClass} onClick={() => setMenuOpen(false)}>Events</NavLink>
+            <NavLink to="/admin/templates" end className={navClass} onClick={() => setMenuOpen(false)}>Templates</NavLink>
             <button onClick={handleLogout}>Logout</button>
           </div>
         </div>

@@ -1,29 +1,34 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
   const [loading, setLoading] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:5000/api/auth/forgot-password", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+
       const data = await res.json();
-      setMessage(data.message || "Request sent.");
-      setMessageType(res.ok ? "success" : "error");
-      if (res.ok) setEmail("");
+
+      if (res.ok) {
+        toast.success(data.message || "Reset link sent! Check your email.");
+        setEmail(""); // clear input
+      } else {
+        toast.error(data.message || "Failed to send reset link.");
+      }
     } catch (err) {
       console.error(err);
-      setMessage("Server error, please try again later.");
-      setMessageType("error");
+      toast.error("Server error, please try again later.");
     } finally {
       setLoading(false);
     }
@@ -37,17 +42,9 @@ export default function ForgotPassword() {
       >
         <h2 className="text-xl font-bold mb-4 text-center">Forgot Password</h2>
 
-        {message && (
-          <p
-            className={`text-center mb-4 ${
-              messageType === "success" ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
-        )}
-
-        <label htmlFor="email" className="sr-only">Email Address</label>
+        <label htmlFor="email" className="sr-only">
+          Email Address
+        </label>
         <input
           id="email"
           type="email"

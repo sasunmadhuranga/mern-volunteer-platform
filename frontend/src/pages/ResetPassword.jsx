@@ -1,21 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ResetPassword() {
   const { resetToken } = useParams();
   const navigate = useNavigate();
-
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
   const [loading, setLoading] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  useEffect(() => {
+    console.log("Reset token:", resetToken);
+    if (!resetToken) navigate("/login");
+  }, [resetToken, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await fetch(
-        `http://localhost:5000/api/auth/reset-password/${resetToken}`,
+        `${API_BASE_URL}/api/auth/reset-password/${resetToken}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -23,14 +28,17 @@ export default function ResetPassword() {
         }
       );
       const data = await res.json();
-      setMessage(data.message || "Operation completed.");
-      setMessageType(res.ok ? "success" : "error");
 
-      if (res.ok) setTimeout(() => navigate("/login"), 1500);
+      if (res.ok) {
+        toast.success(data.message || "Password reset successful!");
+        setPassword("");
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        toast.error(data.message || "Reset failed. Try again.");
+      }
     } catch (err) {
       console.error(err);
-      setMessage("Server error, please try again later.");
-      setMessageType("error");
+      toast.error("Server error, please try again later.");
     } finally {
       setLoading(false);
     }
@@ -43,16 +51,6 @@ export default function ResetPassword() {
         className="bg-white p-6 rounded-lg shadow w-full max-w-md"
       >
         <h2 className="text-xl font-bold mb-4 text-center">Reset Password</h2>
-
-        {message && (
-          <p
-            className={`text-center mb-4 ${
-              messageType === "success" ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
-        )}
 
         <label htmlFor="password" className="sr-only">
           New Password

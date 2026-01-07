@@ -22,7 +22,8 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.11",
     "puppeteer": "^24.34.0",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "sib-api-v3-sdk": "^8.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

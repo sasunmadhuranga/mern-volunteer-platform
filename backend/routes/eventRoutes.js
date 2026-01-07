@@ -93,6 +93,40 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
   }
 });
 
+
+// 🌍 Public events (Landing Page)
+router.get("/public", async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const events = await Event.find({
+      status: "approved",
+      endDate: { $gte: today }
+    })
+      .sort({ startDate: 1 }) // nearest events first
+      .limit(6)
+      .populate("createdBy", "name _id");
+
+    const publicEvents = events.map(event => ({
+      _id: event._id,
+      eventName: event.eventName,
+      eventType: event.eventType,
+      institute: event.institute || event.createdBy?.name,
+      city: event.city,
+      location: event.location,
+      startDate: event.startDate,
+      endDate: event.endDate
+    }));
+
+    res.json(publicEvents);
+  } catch (err) {
+    console.error("Public events error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 router.get("/search", authenticateToken, async (req, res) => {
   try {
     const { eventType, eventName, city } = req.query;

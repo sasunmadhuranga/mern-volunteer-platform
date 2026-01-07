@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useUser } from "../context/UserContext";
+
 export default function Signup() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const { setUser, setToken } = useUser();
+  const navigate = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +29,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,6 +61,40 @@ export default function Signup() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const redirectIfLoggedIn = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const user = res.data.user;
+        setUser(user);
+        setToken(token);
+
+        if (user.role === "ADMIN") navigate("/admin", { replace: true });
+        else if (user.role === "ORG_ADMIN") navigate("/org", { replace: true });
+        else navigate("/volunteer", { replace: true });
+
+      } catch (err) {
+        console.log("Token invalid or expired", err);
+        localStorage.removeItem("token");
+        setLoading(false);
+      }
+    };
+
+    redirectIfLoggedIn();
+  }, [navigate, API_BASE_URL, setUser, setToken]);
+
+  if (loading) return null;
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

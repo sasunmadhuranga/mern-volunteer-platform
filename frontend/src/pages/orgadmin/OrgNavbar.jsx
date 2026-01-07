@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FiUser } from "react-icons/fi";
 import { FaBars, FaTimes } from 'react-icons/fa';
@@ -51,10 +51,12 @@ export default function OrgNavbar() {
     ? user.profilePic
     : `http://localhost:5000${user.profilePic}`;
 
+  const navClass = ({isActive}) => isActive ? "text-white border-b-2 border-white-300 pb-1" : "hover:text-gray-300";
+
   return (
     <div className="sticky top-0 z-50 bg-blue-700 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">
       {/* Left side: Profile picture + name */}
-      <Link to='/org/profile' className="flex items-center space-x-3">
+      <NavLink to='/org/profile' className="flex items-center space-x-3">
         {user.profilePic ? (
           <img
             src={profilePicUrl}
@@ -68,16 +70,16 @@ export default function OrgNavbar() {
         )}
 
         <span className="hidden md:inline font-semibold text-gray-100">{user.name}</span>
-      </Link>
+      </NavLink>
 
       {/* Desktop Nav Links */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
-        <Link to="/org" className="hover:text-gray-300">Dashboard</Link>
-        <Link to="/org/profile" className="hover:text-gray-300">Profile</Link>
-        <Link to="/org/addevents" className="hover:text-gray-300">Add Events</Link>
-        <Link to="/org/manageevents" className="hover:text-gray-300">Manage Events</Link>
-        <Link to="/org/manageapplication" className="hover:text-gray-300">Manage Application</Link>
-        <Link to="/org/selecttemplate" className="hover:text-gray-300">Template</Link>
+        <NavLink to="/org" end className={navClass}>Dashboard</NavLink>
+        <NavLink to="/org/profile" end className={navClass}>Profile</NavLink>
+        <NavLink to="/org/addevents" end className={navClass}>Add Events</NavLink>
+        <NavLink to="/org/manageevents" end className={navClass}>Manage Events</NavLink>
+        <NavLink to="/org/manageapplication" end className={navClass}>Manage Application</NavLink>
+        <NavLink to="/org/selecttemplate" end className={navClass}>Template</NavLink>
         <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
       </div>
 
@@ -94,12 +96,12 @@ export default function OrgNavbar() {
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-700 shadow-md md:hidden animate-slide-down z-40">
           <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
-            <Link to="/org" className="hover:text-gray-300" onClick={() => setMenuOpen(false) }>Dashboard</Link>
-            <Link to="/org/profile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
-            <Link to="/org/addevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Add Events</Link>
-            <Link to="/org/manageevents" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Events</Link>
-            <Link to="/org/manageapplication" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Manage Application</Link>
-            <Link to="/org/selecttemplate" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Template</Link>
+            <NavLink to="/org" end className={navClass} onClick={() => setMenuOpen(false) }>Dashboard</NavLink>
+            <NavLink to="/org/profile" end className={navClass} onClick={() => setMenuOpen(false)}>Profile</NavLink>
+            <NavLink to="/org/addevents" end className={navClass} onClick={() => setMenuOpen(false)}>Add Events</NavLink>
+            <NavLink to="/org/manageevents" end className={navClass} onClick={() => setMenuOpen(false)}>Manage Events</NavLink>
+            <NavLink to="/org/manageapplication" end className={navClass} onClick={() => setMenuOpen(false)}>Manage Application</NavLink>
+            <NavLink to="/org/selecttemplate" end className={navClass} onClick={() => setMenuOpen(false)}>Template</NavLink>
             <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
           </div>
         </div>

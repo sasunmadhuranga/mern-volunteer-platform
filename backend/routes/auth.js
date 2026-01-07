@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import crypto from "crypto";
+import { authenticateToken } from "../middleware/authMiddleware.js";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -64,50 +66,57 @@ router.post('/login', async (req, res) => {
   }
 });
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Gmail App Password
-  },
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
+    // req.user comes from authenticateToken middleware
+    const user = await User.findById(req.user.id).select("-passwordHash"); // hide password
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ user });
+  } catch (err) {
+    console.error("Error fetching user info:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
+// -------------------
+// SENDINBLUE SETUP
+// -------------------
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
+const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+// -------------------
+// FORGOT PASSWORD
+// -------------------
 router.post("/forgot-password", async (req, res) => {
   try {
     const email = req.body.email.toLowerCase().trim();
     const user = await User.findOne({ email });
 
-    // Always return same message (security)
     if (!user) {
       return res.json({ message: "If the email exists, a reset link was sent." });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-
-    user.resetPasswordToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-
+    user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
-
     await user.save();
 
-    const resetLink = `http://localhost:5000/reset-password/${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    await transporter.sendMail({
-      to: user.email,
+    await tranEmailApi.sendTransacEmail({
+      sender: { 
+        name: process.env.SENDINBLUE_SENDER_NAME, 
+        email: process.env.SENDINBLUE_SENDER_EMAIL 
+      },
+      to: [{ email: user.email }],
       subject: "Reset your password",
-      subject: "Test Email",
-      text: "Hello world!"
+      htmlContent: `<p>Click the link below to reset your password:</p>
+                    <a href="${resetLink}">${resetLink}</a>
+                    <p>This link expires in 15 minutes.</p>`
     });
-
-    transporter.verify((err, success) => {
-      if (err) console.log("Nodemailer error:", err);
-      else console.log("Server ready to send emails");
-    });
-
-
 
     res.json({ message: "If the email exists, a reset link was sent." });
   } catch (err) {
@@ -116,24 +125,22 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
+
+// -------------------
+// RESET PASSWORD
+// -------------------
 router.post("/reset-password/:token", async (req, res) => {
   try {
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
-    }
+    if (!user) return res.status(400).json({ message: "Invalid or expired token" });
 
     const passwordHash = await bcrypt.hash(req.body.password, 10);
-
     user.passwordHash = passwordHash;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
@@ -146,6 +153,5 @@ router.post("/reset-password/:token", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 export default router;

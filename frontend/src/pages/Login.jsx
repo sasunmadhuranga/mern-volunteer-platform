@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import axios from "axios";
+
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -8,18 +10,24 @@ export default function Login() {
   });
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const { setUser, setToken } = useUser();
   const navigate = useNavigate();
-  const { setUser, setToken } = useUser(); // grab setToken from context
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
+  const redirectByRole = (role) => {
+    if (role === "ADMIN") navigate("/admin", { replace: true });
+    else if (role === "ORG_ADMIN") navigate("/org", { replace: true });
+    else navigate("/volunteer", { replace: true });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -31,18 +39,16 @@ export default function Login() {
         setMessage("Login successful!");
         setMessageType("success");
 
-        // Save token and user data in localStorage
+        // Save token & user
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Update context
         setUser(data.user);
-        setToken(data.token); // ✅ update context token too
+        setToken(data.token);
 
         // Redirect based on role
-        if (data.user.role === "ADMIN") navigate("/admin", { replace: true });
-        else if (data.user.role === "ORG_ADMIN") navigate("/org", {replace: true});
-        else navigate("/volunteer");
+        redirectByRole(data.user.role);
 
       } else {
         setMessage(data.message || "Invalid credentials.");
@@ -55,6 +61,33 @@ export default function Login() {
     }
   };
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return; // not logged in
+
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const user = res.data.user;
+
+        // Update context
+        setUser(user);
+        setToken(token);
+
+        // Redirect
+        redirectByRole(user.role);
+
+      } catch (err) {
+        console.log("Token invalid or expired", err);
+        localStorage.removeItem("token"); // clear invalid token
+      }
+    };
+
+    checkAuth();
+  }, [API_BASE_URL, navigate, setUser, setToken]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -82,7 +115,6 @@ export default function Login() {
             onChange={handleChange}
             required
             className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-
           />
           <input
             type="password"
@@ -91,7 +123,7 @@ export default function Login() {
             value={formData.password}
             onChange={handleChange}
             required
-            className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 "
+            className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           <button
             type="submit"

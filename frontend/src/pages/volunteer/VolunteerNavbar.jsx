@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { useUser } from "../../context/UserContext";
@@ -26,10 +26,11 @@ export default function VolunteerNavbar() {
     ? user.profilePic
     : `http://localhost:5000${user.profilePic}`;
 
+  const navClass = ({isActive}) => isActive ? "text-white border-b-2 border-white-400 pb-1" : "hover:text-gray-300";
   return (
     <div className="sticky top-0 z-50 bg-teal-800 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">
       {/* Left side: Profile picture + name */}
-      <Link to="/volunteer/volunteerprofile" className="flex items-center space-x-3">
+      <NavLink to="/volunteer/volunteerprofile" className="flex items-center space-x-3">
         {user.profilePic ? (
           <img
             src={profilePicUrl}
@@ -43,15 +44,15 @@ export default function VolunteerNavbar() {
         )}
 
         <span className="hidden md:inline font-semibold text-gray-100">{user.name}</span>
-      </Link>
+      </NavLink>
 
       {/* Desktop Nav Links */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
-          <Link to="/volunteer" className="hover:text-gray-300">Events</Link>
-          <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300">Profile</Link>
-          <Link to="/volunteer/eventhistory" className="hover:text-gray-300">History</Link>
-          <Link to="/volunteer/attendance" className="hover:text-gray-300">Attendance</Link>
-          <Link to="/volunteer/certification" className="hover:text-gray-300">Certification</Link>
+          <NavLink to="/volunteer" end className={navClass}>Events</NavLink>
+          <NavLink to="/volunteer/volunteerprofile" className={navClass}>Profile</NavLink>
+          <NavLink to="/volunteer/eventhistory" className={navClass} >History</NavLink>
+          <NavLink to="/volunteer/attendance" className={navClass}>Attendance</NavLink>
+          <NavLink to="/volunteer/certification" className={navClass}>Certification</NavLink>
           <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
       </div>
 
@@ -68,11 +69,11 @@ export default function VolunteerNavbar() {
           {menuOpen && (
             <div className="absolute top-full left-0 w-full bg-teal-800 shadow-md md:hidden animate-slide-down z-40">
               <div className="flex flex-col items-center gap-4 py-4 text-gray-100 font-medium">
-                <Link to="/volunteer" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Events</Link>
-                <Link to="/volunteer/volunteerprofile" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Profile</Link>
-                <Link to="/volunteer/eventhistory" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>History</Link>
-                <Link to="/volunteer/attendance" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Attendance</Link>
-                <Link to="/volunteer/certification" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>Certification</Link>
+                <NavLink to="/volunteer" end className={navClass} onClick={() => setMenuOpen(false)}>Events</NavLink>
+                <NavLink to="/volunteer/volunteerprofile" end className={navClass} onClick={() => setMenuOpen(false)}>Profile</NavLink>
+                <NavLink to="/volunteer/eventhistory" end className={navClass} onClick={() => setMenuOpen(false)}>History</NavLink>
+                <NavLink to="/volunteer/attendance" end className={navClass} onClick={() => setMenuOpen(false)}>Attendance</NavLink>
+                <NavLink to="/volunteer/certification" end className={navClass} onClick={() => setMenuOpen(false)}>Certification</NavLink>
                 <button onClick={handleLogout} className="hover:text-gray-300">Logout</button>
               </div>
             </div>
