@@ -79,6 +79,7 @@ router.put(
       res.json({ message: "Profile updated", user });
     } catch (err) {
       console.error("Error updating profile:", err);
+      console.error(err.stack);
       res.status(500).json({ message: "Server error" });
     }
   }

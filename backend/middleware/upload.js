@@ -31,4 +31,11 @@ const storage = new CloudinaryStorage({
   },
 });
 
+console.log("Cloudinary ENV:", {
+  name: process.env.CLOUDINARY_CLOUD_NAME,
+  key: !!process.env.CLOUDINARY_API_KEY,
+  secret: !!process.env.CLOUDINARY_API_SECRET,
+});
+
+
 export default multer({ storage });
