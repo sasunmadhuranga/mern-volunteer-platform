@@ -30,12 +30,6 @@ app.use("/api/certificate-templates", certificateTemplateRoutes);
 app.use("/api/orgtemplate", setTemplateRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err.message);
-  console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error" });
-});
-
 
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
