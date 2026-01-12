@@ -53,7 +53,7 @@ function OrgManageApplications() {
     const handleStatusChange = async (appId, newStatus) => {
         try {
         const token = localStorage.getItem("token");
-        const res = await axios.patch(
+        await axios.patch(
             `${API_BASE_URL}/api/event-applications/${appId}/status`,
             { status: newStatus },
             {

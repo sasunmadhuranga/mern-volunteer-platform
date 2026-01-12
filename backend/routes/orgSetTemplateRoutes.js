@@ -1,56 +1,32 @@
 import express from 'express';
-import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { authenticateToken, isOrgAdmin } from '../middleware/authMiddleware.js';
 import OrgCertificateTemplate from '../models/OrgCertificateTemplate.js';
 import User from '../models/User.js'; // import User model
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-// Multer storage
-const storage = multer.diskStorage({
-  destination: async function (req, file, cb) {
-    try {
-      const user = await User.findById(req.user.id);
-      if (!user) return cb(new Error("User not found"));
-
-      const uploadPath = path.join("uploads", "signatures");
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
-      }
-
-      cb(null, uploadPath);
-    } catch (err) {
-      console.error("Error in multer storage destination:", err);
-      cb(err);
-    }
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, `${req.user.id}-${Date.now()}${ext}`);
-  },
-});
-
-const upload = multer({ storage });
-
-// Route to select template and upload signature
+// Select template and upload signature
 router.post(
   "/select-template",
   authenticateToken,
   isOrgAdmin,
-  upload.single("signature"),
+  upload.single("signature"), // Cloudinary
   async (req, res) => {
     try {
       const { templateId } = req.body;
       if (!templateId) return res.status(400).json({ message: "Template ID is required" });
 
-      let orgTemplate = await OrgCertificateTemplate.findOne({ orgId: req.user.orgId });
+      let orgTemplate = await OrgCertificateTemplate.findOne({ orgId: req.user.id });
       if (!orgTemplate) orgTemplate = new OrgCertificateTemplate({ orgId: req.user.id });
 
-
       orgTemplate.templateId = templateId;
-      if (req.file) orgTemplate.signature = `/uploads/signatures/${req.file.filename}`;
+
+      if (req.file && req.file.path) {
+        orgTemplate.signature = req.file.path; // Cloudinary URL
+      }
 
       await orgTemplate.save();
       res.json(orgTemplate);
@@ -60,6 +36,7 @@ router.post(
     }
   }
 );
+
 
 // Get current template for organization
 router.get("/current", authenticateToken, isOrgAdmin, async (req, res) => {

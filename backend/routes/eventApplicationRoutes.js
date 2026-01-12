@@ -1,52 +1,43 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
-import multer from "multer";
 import EventApplication from '../models/EventApplication.js';
-import path from "path";
 import Event from "../models/Event.js";
+import upload from "../middleware/upload.js"; // Cloudinary middleware
 
 const router = express.Router();
 
-// Multer setup
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/qualifications');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// POST /api/event-applications → upload qualification PDF
+router.post(
+  '/',
+  authenticateToken,
+  upload.single('qualificationFile'), // Cloudinary
+  async (req, res) => {
+    try {
+      const { eventId, name, age, contactEmail, phone } = req.body;
+      if (!eventId || !name || !age || !contactEmail || !phone) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
 
-const upload = multer({ storage });
+      const qualificationFile = req.file ? req.file.path : null; // Cloudinary URL
 
-// POST /api/event-applications
-router.post('/', authenticateToken, upload.single('qualificationFile'), async (req, res) => {
-  try {
-    const { eventId, name, age, contactEmail, phone } = req.body;
-    if (!eventId || !name || !age || !contactEmail || !phone) {
-      return res.status(400).json({ error: "Missing required fields" });
+      const application = new EventApplication({
+        userId: req.user.id,
+        eventId,
+        name,
+        age,
+        contactEmail,
+        phone,
+        qualificationFile,
+      });
+
+      await application.save();
+      res.json({ message: 'Application submitted successfully', application });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to submit application' });
     }
-
-    const qualificationFile = req.file ? `/uploads/qualifications/${req.file.filename}` : null;
-
-    const application = new EventApplication({
-      userId: req.user.id,
-      eventId,
-      name,
-      age,
-      contactEmail,
-      phone,
-      qualificationFile,
-    });
-
-    await application.save();
-    res.json({ message: 'Application submitted successfully', application });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to submit application' });
   }
-});
+);
 
 // Get applications for the logged-in user
 router.get('/me', authenticateToken, async (req, res) => {
@@ -62,20 +53,16 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
-// PATCH /api/event-applications/:id/status → Update application status (e.g., cancel)
+// PATCH /api/event-applications/:id/status → Update application status
 router.patch('/:id/status', authenticateToken, async (req, res) => {
   try {
     const { status } = req.body;
-
     if (!['cancelled', 'approved', 'rejected', 'pending'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status value' });
     }
 
-    const app = await EventApplication.findOne({_id: req.params.id});
-
-    if (!app) {
-      return res.status(404).json({ error: 'Application not found' });
-    }
+    const app = await EventApplication.findById(req.params.id);
+    if (!app) return res.status(404).json({ error: 'Application not found' });
 
     if (req.user.role === 'ORG_ADMIN') {
       const event = await Event.findById(app.eventId);
@@ -99,12 +86,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const app = await EventApplication.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id, // Prevent deleting other users' applications
+      userId: req.user.id,
     });
 
-    if (!app) {
-      return res.status(404).json({ error: 'Application not found' });
-    }
+    if (!app) return res.status(404).json({ error: 'Application not found' });
 
     res.json({ message: 'Application deleted successfully' });
   } catch (err) {
@@ -116,7 +101,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 // GET /api/event-applications/event/:eventId
 router.get('/event/:eventId', authenticateToken, async (req, res) => {
   try {
-    // Optional: verify that requester is ORG_ADMIN and owns the event
     const applications = await EventApplication.find({ eventId: req.params.eventId })
       .populate("userId", "name email");
     res.json({ applications });

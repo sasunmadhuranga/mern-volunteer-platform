@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useState } from "react";
@@ -7,7 +7,6 @@ import { useUser } from "../../context/UserContext";
 export default function OrgNavbar() {
   const { user, loading, logout } = useUser(); // ✅ shared state
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
