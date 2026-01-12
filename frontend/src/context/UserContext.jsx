@@ -12,6 +12,20 @@ export function UserProvider({ children }) {
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+  const buildImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
+  };
+
+  const normalizeUser = (u) => {
+    if (!u) return null;
+    return {
+      ...u,
+      profilePicUrl: buildImageUrl(u.profilePic),
+    };
+  };
+
   useEffect(() => {
     if (!token) {
       setLoading(false);
@@ -23,8 +37,10 @@ export function UserProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setUser(res.data.user);
+        setUser(normalizeUser(res.data.user));
       })
+
+
       .catch(() => {
         localStorage.clear();
         setUser(null);
@@ -42,7 +58,16 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, token, setToken, loading, logout }}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser: (u) => setUser(normalizeUser(u)),
+        token,
+        setToken,
+        loading,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

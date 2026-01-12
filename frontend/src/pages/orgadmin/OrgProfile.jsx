@@ -11,10 +11,10 @@ export default function OrgProfile() {
   const [contactEmail, setContactEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [aboutInfo, setAboutInfo] = useState("");
-  const [profilePicUrl, setProfilePicUrl] = useState(null);
   const [profilePicFile, setProfilePicFile] = useState(null);
   const [preview, setPreview] = useState(null);
-
+  const [profilePicRemoved, setProfilePicRemoved] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   // Save original values for "modified" check
   const [originalValues, setOriginalValues] = useState({});
 
@@ -26,7 +26,6 @@ export default function OrgProfile() {
     setContactEmail(user.contactEmail || "");
     setPhone(user.phone || "");
     setAboutInfo(user.aboutInfo || "");
-    setProfilePicUrl(user.profilePic ? `http://localhost:5000${user.profilePic}` : null);
 
     setOriginalValues({
       name: user.name,
@@ -38,19 +37,29 @@ export default function OrgProfile() {
     });
   }, [user]);
 
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfilePicFile(file);
       setPreview(URL.createObjectURL(file));
+      setProfilePicRemoved(false); // user chose a new image, no removal
     }
   };
 
   const handleRemoveImage = () => {
     setProfilePicFile(null);
     setPreview(null);
-    setProfilePicUrl(null);
+    setProfilePicRemoved(true); // mark for removal
   };
+
+
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,41 +76,50 @@ export default function OrgProfile() {
       formData.append("contactEmail", contactEmail);
       formData.append("phone", phone);
       formData.append("aboutInfo", aboutInfo);
+
       if (profilePicFile) {
         formData.append("profilePic", profilePicFile);
-      } else if (!profilePicUrl) {
-        formData.append("removeProfilePic", "true");
+      } else if (profilePicRemoved) {
+        formData.append("removeProfilePic", "true"); // send removal flag
       }
 
+
       const res = await axios.put(
-        "http://localhost:5000/api/users/update",
+        `${API_BASE_URL}/api/users/update`,
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       toast.success("Profile updated successfully!");
-      setUser(res.data.user); // update context
-      setProfilePicUrl(res.data.user.profilePic ? `http://localhost:5000${res.data.user.profilePic}` : null);
+      
+      // Update context with the returned user
+      setUser(res.data.user);
+
+      // Reset local image state
       setPreview(null);
       setProfilePicFile(null);
+      setProfilePicRemoved(false); // reset removal flag
+
+
+      // Update original values for change detection
       setOriginalValues({
         name: res.data.user.name,
         email: res.data.user.email,
         contactEmail: res.data.user.contactEmail || "",
         phone: res.data.user.phone || "",
         aboutInfo: res.data.user.aboutInfo || "",
-        profilePic: res.data.user.profilePic || null
+        profilePic: res.data.user.profilePic || null,
       });
     } catch (err) {
       console.error(err);
       toast.error("Failed to update profile. Please try again.");
     }
   };
+
 
   if (!user) return <p className="text-center">Loading...</p>;
 
@@ -112,7 +130,8 @@ export default function OrgProfile() {
     phone !== originalValues.phone ||
     aboutInfo !== originalValues.aboutInfo ||
     profilePicFile !== null ||
-    (!profilePicUrl && originalValues.profilePic);
+    profilePicRemoved; // <-- now removal triggers save button
+
 
   return (
     <div className="flex justify-center items-center bg-sky-100 px-4 md:px-20 lg:px-40 py-12">
@@ -124,9 +143,15 @@ export default function OrgProfile() {
         {/* Profile Picture */}
         <div className="flex justify-center mb-6">
           <div className="relative w-24 h-24">
-            {preview || profilePicUrl ? (
+            {preview ? (
               <img
-                src={preview || profilePicUrl}
+                src={preview}
+                alt="Profile"
+                className="w-full h-full rounded-full object-cover border"
+              />
+            ) : user.profilePicUrl && !profilePicRemoved ? (
+              <img
+                src={user.profilePicUrl}
                 alt="Profile"
                 className="w-full h-full rounded-full object-cover border"
               />
@@ -136,7 +161,7 @@ export default function OrgProfile() {
               </div>
             )}
 
-            {preview || profilePicUrl ? (
+            {preview || (user.profilePicUrl && !profilePicRemoved) ? (
               <button
                 type="button"
                 onClick={handleRemoveImage}
@@ -160,6 +185,7 @@ export default function OrgProfile() {
               </label>
             )}
           </div>
+
         </div>
 
         {/* Edit Form */}

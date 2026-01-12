@@ -1,42 +1,17 @@
-import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
-import authRoutes from './routes/auth.js';
-import userRoutes from './routes/userRoutes.js';
-import eventRoutes from "./routes/eventRoutes.js";
-import eventApplicationRoutes from "./routes/eventApplicationRoutes.js";
-import eventQRRoutes from "./routes/eventQRRoutes.js";
-import attendanceRoutes from "./routes/attendanceRoutes.js";
-import certificateTemplateRoutes from "./routes/certificateTemplateRoutes.js";
-import certificateTemplatePublicRoutes from "./routes/certificateTemplatePublicRoutes.js";
-import setTemplateRoutes from './routes/orgSetTemplateRoutes.js';
-import certificateRoutes from './routes/volunteerCertificateRoutes.js';
+import app from "./app.js";
 
 dotenv.config();
-const app = express();
 
-app.use(cors());
-
-
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/uploads', express.static('uploads'));
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
-app.use("/api/events", eventRoutes);
-app.use("/api/event-applications", eventApplicationRoutes);
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
-});
-app.use("/api/events", eventQRRoutes);
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/certificate-templates", certificateTemplatePublicRoutes);
-app.use("/api/certificate-templates", certificateTemplateRoutes);
-app.use("/api/orgtemplate", setTemplateRoutes);
-app.use("/api/certificates", certificateRoutes);
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(PORT, () =>
+      console.log(`Server running on port ${PORT}`)
+    );
+  })
+  .catch((err) => console.error(err));

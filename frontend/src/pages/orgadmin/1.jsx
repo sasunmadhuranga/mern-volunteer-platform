@@ -1,169 +1,235 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { FiTrash2, FiEdit2 } from "react-icons/fi";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
-import AttendanceScanner from "../components/AttendanceScanner";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+export default function OrgProfile() {
+  const { user, token, setUser } = useUser(); // get user and token from context
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [aboutInfo, setAboutInfo] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState(null);
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  const [preview, setPreview] = useState(null);
 
-
-export default function AttendanceUI() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [attendanceStatus, setAttendanceStatus] = useState({});
-  const [scannerEvent, setScannerEvent] = useState(null);
-  const navigate = useNavigate();
-
-  const today = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Colombo",
-  });
-
-  // Fetch approved events
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const res = await axios.get(
-          `${API_BASE_URL}/api/event-applications/me`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        const approved = (res.data.applications || []).filter(
-          (app) => app.status === "approved"
-        );
-
-        setEvents(approved);
-      } catch (err) {
-        toast.error("Failed to fetch events");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchEvents();
-  }, []);
-
-  const handleScannerComplete = (message) => {
-    if (scannerEvent) {
-      setAttendanceStatus((prev) => ({
-        ...prev,
-        [scannerEvent.eventId]: message,
-      }));
-    }
-    setScannerEvent(null);
+  // Save original values for "modified" check
+  const [originalValues, setOriginalValues] = useState({});
+  const buildImageUrl = (path) => {
+    if (!path) return null;
+    return `${process.env.REACT_APP_API_BASE_URL}${path}`;
   };
 
-  // Loading
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!user) return;
 
-  // Scanner View
-  if (scannerEvent) {
-    return (
-      <AttendanceScanner
-        eventId={scannerEvent.eventId}
-        eventName={scannerEvent.eventName}
-        action={scannerEvent.action}
-        onComplete={handleScannerComplete}
-      />
-    );
-  }
-  
-    return(
-        <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
-            <div className="w-full max-w-3xl mx-auto space-y-4">
-                {events.map((app) => {
-                const event = app.eventId;
-                const now = new Date();
-                const start = new Date(event.startDate);
-                const end = new Date(event.endDate);
+    setName(user.name);
+    setEmail(user.email);
+    setContactEmail(user.contactEmail || "");
+    setPhone(user.phone || "");
+    setAboutInfo(user.aboutInfo || "");
+    setProfilePicUrl(buildImageUrl(user.profilePic));
 
-                const hasStarted = now >= start;
-                const hasEnded = now > end;
-                const todayWithinEvent = now >= start && now <= end;
-                
-                return (
-                    <div
-                    key={event._id}
-                    className="w-full border rounded-xl p-4 shadow-sm bg-white mb-8"
-                    >
-                    <h2 className="text-center text-lg font-bold text-blue-600">
-                        {event.eventName}
-                    </h2>
 
-                    <p className="text-sm text-gray-600">
-                        {new Date(event.startDate).toLocaleDateString()} →{" "}
-                        {new Date(event.endDate).toLocaleDateString()}
-                    </p>
+    setOriginalValues({
+      name: user.name,
+      email: user.email,
+      contactEmail: user.contactEmail || "",
+      phone: user.phone || "",
+      aboutInfo: user.aboutInfo || "",
+      profilePic: user.profilePic || null
+    });
+  }, [user]);
 
-                    {todayWithinEvent && (
-                        <p className="text-sm mt-1 font-medium">
-                        Today: {today}
-                        </p>
-                    )}
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePicFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
-                    {hasStarted && !hasEnded && (
-                        <div className="flex gap-3 mt-4">
-                        <button
-                            className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-semibold"
-                            onClick={() =>
-                            setScannerEvent({
-                                eventId: event._id,
-                                eventName: event.eventName,
-                                action: "check-in",
-                            })
-                            }
-                        >
-                            Check-In
-                        </button>
+  const handleRemoveImage = () => {
+    setProfilePicFile(null);
+    setPreview(null);
+    setProfilePicUrl(null);
+  };
 
-                        <button
-                            className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold"
-                            onClick={() =>
-                            setScannerEvent({
-                                eventId: event._id,
-                                eventName: event.eventName,
-                                action: "check-out",
-                            })
-                            }
-                        >
-                            Check-Out
-                        </button>
-                        </div>
-                    )}
 
-                    {hasStarted && (
-                        <button
-                        className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold"
-                        onClick={() =>
-                            navigate("/volunteer/attendance-history", {
-                            state: {
-                                eventId: event._id,
-                                eventName: event.eventName,
-                            },
-                            })
-                        }
-                        >
-                        View Attendance History
-                        </button>
-                    )}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-                    {attendanceStatus[event._id] && (
-                        <p className="mt-2 italic text-sm text-gray-600">
-                        {attendanceStatus[event._id]}
-                        </p>
-                    )}
-                    </div>
-                );
-                })}
-            </div>
+    if (!token) {
+      toast.error("Not authorized. Please login again.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("contactEmail", contactEmail);
+      formData.append("phone", phone);
+      formData.append("aboutInfo", aboutInfo);
+      if (profilePicFile) {
+        formData.append("profilePic", profilePicFile);
+      } else if (!profilePicUrl) {
+        formData.append("removeProfilePic", "true");
+      }
+
+      const res = await axios.put(
+        "http://localhost:5000/api/users/update",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      toast.success("Profile updated successfully!");
+      setUser(res.data.user); // update context
+      setProfilePicUrl(buildImageUrl(res.data.user.profilePic));
+      setPreview(null);
+      setProfilePicFile(null);
+      setOriginalValues({
+        name: res.data.user.name,
+        email: res.data.user.email,
+        contactEmail: res.data.user.contactEmail || "",
+        phone: res.data.user.phone || "",
+        aboutInfo: res.data.user.aboutInfo || "",
+        profilePic: res.data.user.profilePic || null
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile. Please try again.");
+    }
+  };
+
+  if (!user) return <p className="text-center">Loading...</p>;
+
+  const isModified =
+    name !== originalValues.name ||
+    email !== originalValues.email ||
+    contactEmail !== originalValues.contactEmail ||
+    phone !== originalValues.phone ||
+    aboutInfo !== originalValues.aboutInfo ||
+    profilePicFile !== null ||
+    (!profilePicUrl && originalValues.profilePic);
+
+  return (
+    <div className="flex justify-center items-center bg-sky-100 px-4 md:px-20 lg:px-40 py-12">
+      <div className="w-full max-w-2xl bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-2xl font-semibold text-sky-800 mb-6 text-center">
+          Edit Organization Profile
+        </h2>
+
+        {/* Profile Picture */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-24 h-24">
+            {preview || profilePicUrl ? (
+              <img
+                src={preview || profilePicUrl}
+                alt="Profile"
+                className="w-full h-full rounded-full object-cover border"
+              />
+            ) : (
+              <div className="w-full h-full rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-xl">
+                ORG
+              </div>
+            )}
+
+            {preview || profilePicUrl ? (
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute bottom-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                title="Remove photo"
+              >
+                <FiTrash2 className="w-5 h-5" />
+              </button>
+            ) : (
+              <label
+                className="absolute bottom-0 right-0 bg-sky-600 text-white rounded-full p-1 hover:bg-sky-700 cursor-pointer"
+                title="Upload photo"
+              >
+                <FiEdit2 className="w-5 h-5" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
         </div>
-    );
+
+        {/* Edit Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 font-medium">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Email (for contacts)</label>
+            <input
+              type="email"
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">About Us</label>
+            <textarea
+              value={aboutInfo}
+              onChange={(e) => setAboutInfo(e.target.value)}
+              rows={5}
+              className="w-full border border-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className={`w-full bg-sky-600 text-white py-2 rounded-lg hover:bg-sky-700 transition-opacity duration-200 ${
+              isModified ? "" : "invisible pointer-events-none"
+            }`}
+          >
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }

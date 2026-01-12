@@ -54,7 +54,7 @@ export default function Landing() {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <header className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
-        <h1 className="text-xl font-bold text-sky-700">VolunteerHub</h1>
+        <h1 className="text-xl font-bold text-sky-700">ServeLocal</h1>
         <div className="space-x-4">
           <Link to="/login" className="text-gray-700 hover:text-sky-600">
             Login

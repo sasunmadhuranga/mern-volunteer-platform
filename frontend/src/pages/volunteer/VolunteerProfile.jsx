@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -6,6 +6,7 @@ import axios from "axios";
 import { useUser } from "../../context/UserContext";
 
 export default function VolunteerProfile() {
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const { user, setUser, token } = useUser(); // get user & token from context
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
@@ -16,9 +17,23 @@ export default function VolunteerProfile() {
   const [address, setAddress] = useState(user?.address || "");
   const [city, setCity] = useState(user?.city || "");
   const [profilePicFile, setProfilePicFile] = useState(null);
-  const [preview, setPreview] = useState(user?.profilePic ? `http://localhost:5000${user.profilePic}` : null);
+  const [preview, setPreview] = useState(null);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+
+    setName(user.name || "");
+    setBirthday(user.birthday || "");
+    setGender(user.gender || "");
+    setContactEmail(user.contactEmail || "");
+    setPhone(user.phone || "");
+    setAddress(user.address || "");
+    setCity(user.city || "");
+    setPreview(user.profilePicUrl || null);
+  }, [user]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +57,7 @@ export default function VolunteerProfile() {
       }
 
       const res = await axios.put(
-        "http://localhost:5000/api/users/update",
+        `${API_BASE_URL}/api/users/update`,
         formData,
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
       );
@@ -50,7 +65,7 @@ export default function VolunteerProfile() {
       setSuccess("Profile updated successfully.");
       const updatedUser = res.data.user;
       setUser(updatedUser); // update context
-      setPreview(updatedUser.profilePic ? `http://localhost:5000${updatedUser.profilePic}` : null);
+      setPreview(null);
       setProfilePicFile(null);
       setIsEditing(false);
     } catch (err) {
