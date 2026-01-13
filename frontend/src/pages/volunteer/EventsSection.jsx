@@ -153,16 +153,20 @@ export default function EventsSection() {
       </div>
 
       {loadingEvents ? (
-        <p className="text-gray-700 mt-6 text-center">Loading events...</p>
-      ) : upcomingEvents.length === 0 ? (
+        <div className="flex justify-center items-center mt-6">
+          <div className="loader border-t-4 border-b-4 border-sky-600 w-12 h-12 rounded-full animate-spin"></div>
+          <span className="ml-2 text-gray-700">Loading events...</span>
+        </div>
+      ) : events.length === 0 ? (
         <p className="text-gray-700 mt-6 text-center">No events found.</p>
       ) : (
         <EventList
-          events={upcomingEvents}
+          events={events.filter(event => event.endDate.split("T")[0] >= todayKey)}
           handleOrgClick={handleClick}
           filters={{ eventType, eventName, city }}
         />
       )}
+
 
       {/* Org Profile Modal */}
       {showOrgProfile && (
