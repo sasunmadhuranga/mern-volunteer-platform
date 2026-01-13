@@ -161,7 +161,7 @@ export default function EventsSection() {
         <p className="text-gray-700 mt-6 text-center">No events found.</p>
       ) : (
         <EventList
-          events={events.filter(event => event.endDate.split("T")[0] >= todayKey)}
+          events={upcomingEvents}
           handleOrgClick={handleClick}
           filters={{ eventType, eventName, city }}
         />
