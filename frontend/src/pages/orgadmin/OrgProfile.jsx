@@ -5,7 +5,7 @@ import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
 
 export default function OrgProfile() {
-  const { user, token, setUser } = useUser(); // get user and token from context
+  const { user, token, setUser } = useUser(); 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -15,7 +15,6 @@ export default function OrgProfile() {
   const [preview, setPreview] = useState(null);
   const [profilePicRemoved, setProfilePicRemoved] = useState(false);
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-  // Save original values for "modified" check
   const [originalValues, setOriginalValues] = useState({});
 
   useEffect(() => {
@@ -37,20 +36,19 @@ export default function OrgProfile() {
     });
   }, [user]);
 
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfilePicFile(file);
       setPreview(URL.createObjectURL(file));
-      setProfilePicRemoved(false); // user chose a new image, no removal
+      setProfilePicRemoved(false); 
     }
   };
 
   const handleRemoveImage = () => {
     setProfilePicFile(null);
     setPreview(null);
-    setProfilePicRemoved(true); // mark for removal
+    setProfilePicRemoved(true); 
   };
 
 
@@ -96,16 +94,13 @@ export default function OrgProfile() {
 
       toast.success("Profile updated successfully!");
       
-      // Update context with the returned user
       setUser(res.data.user);
 
-      // Reset local image state
       setPreview(null);
       setProfilePicFile(null);
       setProfilePicRemoved(false); // reset removal flag
 
 
-      // Update original values for change detection
       setOriginalValues({
         name: res.data.user.name,
         email: res.data.user.email,
@@ -130,17 +125,16 @@ export default function OrgProfile() {
     phone !== originalValues.phone ||
     aboutInfo !== originalValues.aboutInfo ||
     profilePicFile !== null ||
-    profilePicRemoved; // <-- now removal triggers save button
+    profilePicRemoved;
 
 
   return (
     <div className="flex justify-center items-center bg-sky-100 px-4 md:px-20 lg:px-40 py-12">
       <div className="w-full max-w-2xl bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold text-sky-800 mb-6 text-center">
-          Edit Organization Profile
+          Edit Profile
         </h2>
 
-        {/* Profile Picture */}
         <div className="flex justify-center mb-6">
           <div className="relative w-24 h-24">
             {preview ? (

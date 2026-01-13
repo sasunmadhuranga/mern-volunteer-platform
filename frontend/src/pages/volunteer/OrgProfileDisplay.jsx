@@ -1,5 +1,4 @@
 export default function OrgProfileDisplay({ onClose, loading, error, profile }) {
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -21,7 +20,7 @@ export default function OrgProfileDisplay({ onClose, loading, error, profile }) 
             <div className="flex flex-col items-center space-y-4">
               {profile.profilePic ? (
                 <img
-                  src={`${API_BASE_URL}${profile.profilePic}`}
+                  src={profile.profilePic}
                   alt={`${profile.name} profile`}
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -31,7 +30,7 @@ export default function OrgProfileDisplay({ onClose, loading, error, profile }) 
                 </div>
               )}
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
-              <p><strong>Email:</strong> {profile.contactEmail || profile.email}</p>
+              <p><strong>Email:</strong> {profile.contactEmail}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
             </div>
             <div className="mt-4 text-gray-700">

@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import User from "../models/User.js";
-import upload from "../middleware/upload.js"; // Cloudinary multer
+import upload from "../middleware/upload.js"; 
 
 const router = express.Router();
 

@@ -11,6 +11,7 @@ import certificateTemplateRoutes from "./routes/certificateTemplateRoutes.js";
 import certificateTemplatePublicRoutes from "./routes/certificateTemplatePublicRoutes.js";
 import setTemplateRoutes from "./routes/orgSetTemplateRoutes.js";
 import certificateRoutes from "./routes/volunteerCertificateRoutes.js";
+import organizationRoutes from "./routes/organizationRoutes.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/certificate-templates", certificateTemplatePublicRoutes);
 app.use("/api/certificate-templates", certificateTemplateRoutes);
 app.use("/api/orgtemplate", setTemplateRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/organizations", organizationRoutes);
 
 
 app.get("/", (req, res) => {

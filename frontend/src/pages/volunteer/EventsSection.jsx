@@ -14,14 +14,17 @@ export default function EventsSection() {
   const [orgProfile, setOrgProfile] = useState(null);
   const [orgLoading, setOrgLoading] = useState(false);
   const [orgError, setOrgError] = useState("");
+  const [loadingEvents, setLoadingEvents] = useState(true);
 
   // Fetch all events on mount
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoadingEvents(true);
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           setError("No token found. Please log in.");
+          setLoadingEvents(false);
           return;
         }
 
@@ -33,6 +36,8 @@ export default function EventsSection() {
       } catch (err) {
         console.error("Failed to fetch events:", err);
         setError("Failed to load events.");
+      }finally {
+        setLoadingEvents(false);
       }
     };
 
@@ -68,14 +73,11 @@ export default function EventsSection() {
     setOrgError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+      const res = await axios.get(
+        `${API_BASE_URL}/api/organizations/${orgId}/public`
+      );
 
-      const res = await axios.get(`${API_BASE_URL}/api/users/${orgId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setOrgProfile(res.data.user);
+      setOrgProfile(res.data);
     } catch (err) {
       console.error("Error fetching org profile:", err);
       setOrgError("Failed to load organization profile.");
@@ -84,6 +86,7 @@ export default function EventsSection() {
       setOrgLoading(false);
     }
   };
+
 
   if (error) return <p className="text-red-600">{error}</p>;
 
@@ -149,12 +152,17 @@ export default function EventsSection() {
         </div>
       </div>
 
-      {/* Event Cards */}
-      <EventList
-        events={upcomingEvents}
-        handleOrgClick={handleClick}
-        filters={{ eventType, eventName, city }}
-      />
+      {loadingEvents ? (
+        <p className="text-gray-700 mt-6 text-center">Loading events...</p>
+      ) : upcomingEvents.length === 0 ? (
+        <p className="text-gray-700 mt-6 text-center">No events found.</p>
+      ) : (
+        <EventList
+          events={upcomingEvents}
+          handleOrgClick={handleClick}
+          filters={{ eventType, eventName, city }}
+        />
+      )}
 
       {/* Org Profile Modal */}
       {showOrgProfile && (

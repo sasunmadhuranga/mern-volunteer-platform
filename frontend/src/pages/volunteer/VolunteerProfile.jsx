@@ -31,7 +31,7 @@ export default function VolunteerProfile() {
     setPhone(user.phone || "");
     setAddress(user.address || "");
     setCity(user.city || "");
-    setPreview(user.profilePicUrl || null);
+    setPreview(user.profilePic || null);
   }, [user]);
 
 

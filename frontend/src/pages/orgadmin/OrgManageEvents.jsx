@@ -137,7 +137,7 @@ export default function OrgManageEvents(){
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  if (loading) return (<div>Loading events...</div>);
+  if (loading) return (<div className="text-center">Loading events...</div>);
 
 return (
   <div className="flex justify-center items-center bg-sky-100 px-4 py-12 md:px-20 lg:px-40">
