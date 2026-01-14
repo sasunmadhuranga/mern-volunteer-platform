@@ -8,19 +8,25 @@ export default function Landing() {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
   const { setUser, setToken } = useUser();
+  const [loading, setLoading] = useState(true);
 
   // Fetch public events
   useEffect(() => {
     const fetchPublicEvents = async () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/events/public`);
-        setEvents(res.data.slice(0, 6));
+        setEvents(Array.isArray(res.data) ? res.data.slice(0, 6) : []);
       } catch (err) {
-        console.error("Failed to load public events");
+        console.error("Failed to load public events", err);
+        setEvents([]);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchPublicEvents();
   }, [API_BASE_URL]);
+
 
   // Check if user is logged in
   useEffect(() => {
@@ -112,77 +118,80 @@ export default function Landing() {
         </div>
       </section>
 
-      {events.length === 0 ? (
-         <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-          <h3 className="text-2xl font-semibold mb-4">
-            No upcoming volunteer events right now
-          </h3>
-          <p className="text-gray-600 mb-6">
-            New opportunities are added regularly. Create an account to get notified when events go live.
-          </p>
+      {loading ? (
+          <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+            <p className="text-gray-500">Loading events...</p>
+          </section>
+        ) : events.length === 0 ? (
+          <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+            <h3 className="text-2xl font-semibold mb-4">
+              No upcoming volunteer events right now
+            </h3>
+            <p className="text-gray-600 mb-6">
+              New opportunities are added regularly. Create an account to get notified when events go live.
+            </p>
 
-          <Link
-            to="/signup"
-            className="inline-block bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-700"
-          >
-            Join VolunteerHub
-          </Link>
-        </section>
-      )
-        : (
-        <section className="max-w-7xl mx-auto px-6 py-20">
-          <h3 className="text-3xl font-semibold text-center mb-12">
-            Upcoming Volunteer Opportunities
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <div
-                key={event._id}
-                className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-1 hover:shadow-xl transition relative"
-              >
-                <span className="inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full mb-3">
-                  {event.eventType} &nbsp;Event
-                </span>
+            <Link
+              to="/signup"
+              className="inline-block bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-700"
+            >
+              Join VolunteerHub
+            </Link>
+          </section>
+        ) : (
+          <section className="max-w-7xl mx-auto px-6 py-20">
+            <h3 className="text-3xl font-semibold text-center mb-12">
+              Upcoming Volunteer Opportunities
+            </h3>
 
-                <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                  {event.eventName}
-                </h4>
-
-                <p className="text-sm text-gray-600 mb-1">
-                  📍 {event.location}, {event.city}
-                </p>
-
-                <p className="text-sm text-gray-500 mb-4">
-                  🗓{" "}
-                  {new Date(event.startDate).toLocaleDateString()} –{" "}
-                  {new Date(event.endDate).toLocaleDateString()}
-                </p>
-
-                <button
-                  onClick={() => navigate("/login")}
-                  className="mt-auto w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {events.map((event) => (
+                <div
+                  key={event._id}
+                  className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-1 hover:shadow-xl transition relative"
                 >
-                  Login to Apply →
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span className="inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full mb-3">
+                    {event.eventType} &nbsp;Event
+                  </span>
 
-        {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <p className="text-gray-600 mb-4">
-            Want to see more opportunities?
-          </p>
-          <Link
-            to="/signup"
-            className="text-sky-600 font-semibold hover:underline"
-          >
-            Create an account to explore all events →
-          </Link>
-        </div>
-      </section>
-        
-      )}
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                    {event.eventName}
+                  </h4>
+
+                  <p className="text-sm text-gray-600 mb-1">
+                    📍 {event.location}, {event.city}
+                  </p>
+
+                  <p className="text-sm text-gray-500 mb-4">
+                    🗓 {new Date(event.startDate).toLocaleDateString()} –{" "}
+                    {new Date(event.endDate).toLocaleDateString()}
+                  </p>
+
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="mt-auto w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700"
+                  >
+                    Login to Apply →
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-16">
+              <p className="text-gray-600 mb-4">
+                Want to see more opportunities?
+              </p>
+              <Link
+                to="/signup"
+                className="text-sky-600 font-semibold hover:underline"
+              >
+                Create an account to explore all events →
+              </Link>
+            </div>
+          </section>
+        )}
+
+
       {/* Footer */}
       <footer className="text-center text-sm text-gray-500 py-6 border-t">
         © {new Date().getFullYear()} VolunteerHub. All rights reserved.
