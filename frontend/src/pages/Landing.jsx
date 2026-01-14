@@ -112,45 +112,61 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Events Preview */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <h3 className="text-3xl font-semibold text-center mb-12">
-          Upcoming Volunteer Opportunities
-        </h3>
+      {events.length === 0 ? (
+         <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+          <h3 className="text-2xl font-semibold mb-4">
+            No upcoming volunteer events right now
+          </h3>
+          <p className="text-gray-600 mb-6">
+            New opportunities are added regularly. Create an account to get notified when events go live.
+          </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {events.map((event) => (
-            <div
-              key={event._id}
-              className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-1 hover:shadow-xl transition relative"
-            >
-              <span className="inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full mb-3">
-                {event.eventType} &nbsp;Event
-              </span>
-
-              <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                {event.eventName}
-              </h4>
-
-              <p className="text-sm text-gray-600 mb-1">
-                📍 {event.location}, {event.city}
-              </p>
-
-              <p className="text-sm text-gray-500 mb-4">
-                🗓{" "}
-                {new Date(event.startDate).toLocaleDateString()} –{" "}
-                {new Date(event.endDate).toLocaleDateString()}
-              </p>
-
-              <button
-                onClick={() => navigate("/login")}
-                className="mt-auto w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700"
+          <Link
+            to="/signup"
+            className="inline-block bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-700"
+          >
+            Join VolunteerHub
+          </Link>
+        </section>
+      )
+        : (
+        <section className="max-w-7xl mx-auto px-6 py-20">
+          <h3 className="text-3xl font-semibold text-center mb-12">
+            Upcoming Volunteer Opportunities
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {events.map((event) => (
+              <div
+                key={event._id}
+                className="bg-white rounded-2xl shadow-md p-6 hover:-translate-y-1 hover:shadow-xl transition relative"
               >
-                Login to Apply →
-              </button>
-            </div>
-          ))}
-        </div>
+                <span className="inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full mb-3">
+                  {event.eventType} &nbsp;Event
+                </span>
+
+                <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                  {event.eventName}
+                </h4>
+
+                <p className="text-sm text-gray-600 mb-1">
+                  📍 {event.location}, {event.city}
+                </p>
+
+                <p className="text-sm text-gray-500 mb-4">
+                  🗓{" "}
+                  {new Date(event.startDate).toLocaleDateString()} –{" "}
+                  {new Date(event.endDate).toLocaleDateString()}
+                </p>
+
+                <button
+                  onClick={() => navigate("/login")}
+                  className="mt-auto w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700"
+                >
+                  Login to Apply →
+                </button>
+              </div>
+            ))}
+          </div>
 
         {/* Bottom CTA */}
         <div className="text-center mt-16">
@@ -165,7 +181,8 @@ export default function Landing() {
           </Link>
         </div>
       </section>
-
+        
+      )}
       {/* Footer */}
       <footer className="text-center text-sm text-gray-500 py-6 border-t">
         © {new Date().getFullYear()} VolunteerHub. All rights reserved.
