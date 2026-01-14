@@ -15,8 +15,33 @@ import organizationRoutes from "./routes/organizationRoutes.js";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://mern-volunteer-platform.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+// Handle preflight requests
+app.options("*", cors());
+
 app.use(express.json());
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

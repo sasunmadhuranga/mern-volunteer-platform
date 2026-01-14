@@ -54,7 +54,7 @@ export default function Landing() {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <header className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
-        <h1 className="text-xl font-bold text-sky-700">ServeLocal</h1>
+        <h1 className="text-2xl font-bold bg-gradient-to-br from-violet-600 to-blue-700 bg-clip-text text-transparent">VolunteerHub</h1>
         <div className="space-x-4">
           <Link to="/login" className="text-gray-700 hover:text-sky-600">
             Login
@@ -69,7 +69,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-sky-600 to-blue-700 text-white py-24 px-6">
+      <section className="bg-gradient-to-br from-violet-600 to-blue-700 text-white py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
             Be the Change. <br /> Volunteer for What Matters.
