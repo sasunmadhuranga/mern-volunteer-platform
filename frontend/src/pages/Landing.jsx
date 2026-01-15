@@ -59,7 +59,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <header className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+      <header className="sticky top-0 z-50 bg-white shadow-sm flex justify-between items-center px-20 py-4 w-full mx-auto">
         <h1 className="text-2xl font-bold bg-gradient-to-br from-violet-600 to-blue-700 bg-clip-text text-transparent">VolunteerHub</h1>
         <div className="space-x-4">
           <Link to="/login" className="text-gray-700 hover:text-sky-600">
@@ -119,11 +119,11 @@ export default function Landing() {
       </section>
 
       {loading ? (
-          <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+          <section className="max-w-4xl mx-auto px-6 py-10 text-center">
             <p className="text-gray-500">Loading events...</p>
           </section>
         ) : events.length === 0 ? (
-          <section className="max-w-4xl mx-auto px-6 py-20 text-center">
+          <section className="max-w-4xl mx-auto px-6 py-10 text-center">
             <h3 className="text-2xl font-semibold mb-4">
               No upcoming volunteer events right now
             </h3>

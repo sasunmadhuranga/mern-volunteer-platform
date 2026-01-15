@@ -6,7 +6,6 @@ import * as crypto from 'crypto';
 
 const router = express.Router();
 
-// Add Event (only ORG_ADMINs should be allowed ideally)
 router.post("/add", authenticateToken, async (req, res) => {
   try {
     const {

@@ -21,7 +21,7 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
             <div className="flex flex-col items-center space-y-4">
               {profile.profilePic ? (
                 <img
-                  src={`${API_BASE_URL}${profile.profilePic}`}
+                  src={profile.profilePic.startsWith("http") ? profile.profilePic : `${API_BASE_URL}/${profile.profilePic}`}
                   alt={`${profile.name} profile`}
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -31,7 +31,7 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                 </div>
               )}
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
-              <p><strong>Email:</strong> {profile.contactEmail || profile.email}</p>
+              <p><strong>Email:</strong> {profile.contactEmail}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
               {profile.qualificationFile && (
                 <p><strong>Qualification: {" "}</strong>

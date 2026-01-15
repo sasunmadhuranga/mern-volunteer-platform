@@ -8,8 +8,8 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   const [city, setCity] = useState(initialValues.city || "");
   const [startDate, setStartDate] = useState(initialValues.startDate ? initialValues.startDate.slice(0, 10) : "");
   const [endDate, setEndDate] = useState(initialValues.endDate ? initialValues.endDate.slice(0, 10) : "");
-  const [startTime, setStartTime] = useState(initialValues.startTime ? initialValues.startTime.slice(0, 10) : "");
-  const [endTime, setEndTime] = useState(initialValues.endTime ? initialValues.endTime.slice(0, 10) : "");
+  const [startTime, setStartTime] = useState(initialValues.startTime || "");
+  const [endTime, setEndTime] = useState(initialValues.endTime || "");
   const [opportunity, setOpportunity] = useState(initialValues.opportunity || 0);
   const [minAge, setMinAge] = useState(initialValues.minAge || "");
   const [maxAge, setMaxAge] = useState(initialValues.maxAge || "");
@@ -40,6 +40,8 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
     });
   };
 
+  const baseInput = "w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
@@ -49,11 +51,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={eventName}
           required
           onChange={(e) => setEventName(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Institute - disabled in edit mode */}
       <div>
         <label className="block text-gray-700 font-medium">Institute</label>
         <input
@@ -68,7 +69,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         />
       </div>
 
-      {/* Location - disabled in edit mode */}
       <div>
         <label className="block text-gray-700 font-medium">Location</label>
         <input
@@ -83,7 +83,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         />
       </div>
 
-      {/* City - disabled in edit mode */}
       <div>
         <label className="block text-gray-700 font-medium">City</label>
         <input
@@ -98,7 +97,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         />
       </div>
 
-      {/* Start Date */}
       <div>
         <label className="block text-gray-700 font-medium">Start Date</label>
         <input
@@ -106,11 +104,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={startDate}
           required
           onChange={(e) => setStartDate(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* End Date */}
       <div>
         <label className="block text-gray-700 font-medium">End Date</label>
         <input
@@ -118,7 +115,7 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={endDate}
           required
           onChange={(e) => setEndDate(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
@@ -129,7 +126,7 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={startTime}
           required
           onChange={(e) => setStartTime(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
       <div>
@@ -139,11 +136,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           value={endTime}
           required
           onChange={(e) => setEndTime(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Available Opportunities */}
       <div>
         <label className="block text-gray-700 font-medium">Available Opportunities</label>
         <input
@@ -152,11 +148,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           min={0}
           required
           onChange={(e) => setOpportunity(Number(e.target.value))}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Minimum Age */}
       <div>
         <label className="block text-gray-700 font-medium">Minimum Age</label>
         <input
@@ -165,11 +160,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           min={18}
           required
           onChange={(e) => setMinAge(Number(e.target.value))}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Maximum Age */}
       <div>
         <label className="block text-gray-700 font-medium">Maximum Age</label>
         <input
@@ -178,17 +172,16 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           min={minAge || ""}
           required
           onChange={(e) => setMaxAge(Number(e.target.value))}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Qualification */}
       <div>
         <label className="block text-gray-700 font-medium">Qualification</label>
         <select
           value={qualification}
           onChange={(e) => setQualification(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         >
           <option value="">Select</option>
           <option value="Required">Required</option>
@@ -196,14 +189,13 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         </select>
       </div>
 
-      {/* Type of Qualifications (conditional) */}
       {qualification === "Required" && (
         <div>
           <label className="block text-gray-700 font-medium">Type of Qualifications</label>
           <select
             value={qualificationType}
             onChange={(e) => setQualificationType(e.target.value)}
-            className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className={baseInput}
           >
             <option value="">Select</option>
             <option value="O/L">O/L</option>
@@ -214,7 +206,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
         </div>
       )}
 
-      {/* Min Work Days */}
       <div>
         <label className="block text-gray-700 font-medium">Min Work Days Needed for Certification</label>
         <input
@@ -223,11 +214,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           min={0}
           required
           onChange={(e) => setMinDay(Number(e.target.value))}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         />
       </div>
 
-      {/* Description */}
       <div>
         <label className="block text-gray-700 font-medium">Description</label>
         <textarea
@@ -235,11 +225,10 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
           rows={6}
           required
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={baseInput}
         ></textarea>
       </div>
 
-      {/* Submit Button */}
       <div>
         <button
           type="submit"

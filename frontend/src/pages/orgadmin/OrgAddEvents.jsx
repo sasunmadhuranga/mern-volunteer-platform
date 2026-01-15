@@ -153,7 +153,7 @@ export default function OrgEvents() {
       <div className="w-full max-w-2xl bg-white p-6 rounded-xl shadow-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-sky-800">
-            Add Event - {eventType}
+            Add Event - {eventType} Event
           </h2>
           <button
             type="button"
