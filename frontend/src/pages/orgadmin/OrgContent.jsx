@@ -10,6 +10,7 @@ export default function OrgContent() {
     totalApplications: 0,
   });
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     async function fetchStats() {
@@ -44,8 +45,10 @@ export default function OrgContent() {
           activeEvents,
           totalApplications,
         });
+        setLoading(false)
       } catch (err) {
         console.error("Failed to fetch org stats:", err);
+        setLoading(false);
       }
     }
 
@@ -61,6 +64,8 @@ export default function OrgContent() {
     const endDate = event.endDate.split("T")[0];
     return endDate >= todayKey; // future or ongoing only
   });
+
+  if (loading) return (<div className="text-center">Loading events...</div>);
 
   return (
     <div className="p-6 space-y-8">

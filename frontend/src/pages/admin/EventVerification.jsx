@@ -9,11 +9,13 @@ export default function AdminEventVerification() {
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [loading, setLoading] = useState(true);
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Not authorized. Please login again.");
+      setLoading(false);
       return;
     }
 
@@ -26,8 +28,12 @@ export default function AdminEventVerification() {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setEvents(sorted)
+        setLoading(false);
       })
-      .catch(() => setError("Failed to load events."));
+      .catch(() => {
+        setError("Failed to load events.");
+        setLoading(false);
+      })
   }, [API_BASE_URL]);
 
   const updateStatus = async (id, status) => {
@@ -59,7 +65,8 @@ export default function AdminEventVerification() {
     setSelectedEventId(null);
     setSelectedStatus("");
   }
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (loading) return <p className="text-center text-gray-500">Loading events...</p>;
+  if (error) return <p className="text-red-600 text-center">{error}</p>;
   
   const filterEvents = events.filter(event => {
     if(filterStatus === "all") return true;
