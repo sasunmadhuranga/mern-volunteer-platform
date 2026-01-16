@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
@@ -35,12 +35,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   return (
-    <Router> {/* ✅ Wrap everything in Router */}
+    <>
       <ToastContainer position="top-right" autoClose={3000} />
 
       <UserProvider>
         <Routes>
-
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<Signup />} />
@@ -98,9 +97,8 @@ export default function App() {
             <Route path="attendance-history" element={<AttendanceHistory />} />
             <Route path="certification" element={<CertificateGenerator />} />
           </Route>
-
         </Routes>
       </UserProvider>
-    </Router>
+    </>
   );
 }
