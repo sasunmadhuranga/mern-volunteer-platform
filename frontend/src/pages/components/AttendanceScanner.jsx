@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function AttendanceScanner({ eventId, eventName, onComplete }) {
   const navigate = useNavigate();
+
   const scannerRef = useRef(null);
   const isRunningRef = useRef(false);
 
@@ -15,50 +16,6 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
   const today = new Date().toLocaleDateString("en-CA", {
     timeZone: "Asia/Colombo",
   });
-
-  // ✅ Define handleScan before useEffect
-  const handleScan = useCallback(
-    async (result) => {
-      try {
-        const parsed = JSON.parse(result);
-
-        if (!parsed.eventId || !parsed.date || !parsed.token || !parsed.scanType) {
-          toast.error("Invalid QR Code");
-          isRunningRef.current = true;
-          return;
-        }
-
-        setLoading(true);
-        const authToken = localStorage.getItem("token");
-
-        const res = await fetch(`${API_BASE_URL}/api/attendance/scan`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(parsed),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          toast.error(data.message || "Scan Failed");
-          isRunningRef.current = true;
-        } else {
-          toast.success(data.message);
-          onComplete?.(data.message);
-          navigate("/volunteer/attendance", { replace: true });
-        }
-      } catch {
-        toast.error("QR Parsing Failed");
-        isRunningRef.current = true;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [navigate, onComplete]
-  );
 
   useEffect(() => {
     const scanner = new Html5Qrcode("qr-reader");
@@ -71,6 +28,7 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
           { fps: 10, qrbox: 250 },
           async (decodedText) => {
             if (!isRunningRef.current) return;
+
             isRunningRef.current = false;
             await handleScan(decodedText);
           }
@@ -92,7 +50,47 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
           .finally(() => scannerRef.current.clear());
       }
     };
-  }, [handleScan]); // ✅ safe now
+  }, []);
+
+  const handleScan = async (result) => {
+    try {
+      const parsed = JSON.parse(result);
+
+      if (!parsed.eventId || !parsed.date || !parsed.token || !parsed.scanType) {
+        toast.error("Invalid QR Code");
+        isRunningRef.current = true;
+        return;
+      }
+
+      setLoading(true);
+      const authToken = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE_URL}/api/attendance/scan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(parsed),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Scan Failed");
+        isRunningRef.current = true;
+      } else {
+        toast.success(data.message);
+        onComplete?.(data.message);
+        navigate("/volunteer/attendance", { replace: true });
+      }
+    } catch {
+      toast.error("QR Parsing Failed");
+      isRunningRef.current = true;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">

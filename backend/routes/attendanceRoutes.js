@@ -3,6 +3,7 @@ import Attendance from "../models/Attendance.js";
 import Event from "../models/Event.js";
 import EventApplication from "../models/EventApplication.js";
 import { authenticateToken } from "../middleware/authMiddleware.js";
+import { DateTime } from "luxon";
 
 const router = express.Router();
 
@@ -35,12 +36,12 @@ router.post("/scan", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "QR code not valid for this day" });
     }
 
-    // Validate event time
-    const now = new Date();
-    const eventStart = new Date(`${date}T${event.startTime}`);
-    const eventEnd = new Date(`${date}T${event.endTime}`);
+    const tz = "Asia/Colombo";
+    const eventStart = DateTime.fromISO(`${date}T${event.startTime}`, { zone: tz });
+    const eventEnd = DateTime.fromISO(`${date}T${event.endTime}`, { zone: tz });
+    const nowColombo = DateTime.now().setZone(tz);
 
-    if (now < eventStart || now > eventEnd) {
+    if (nowColombo < eventStart || nowColombo > eventEnd) {
       return res.status(403).json({ message: "QR scan is outside event time" });
     }
 
