@@ -35,7 +35,7 @@ export default function EditTemplate() {
       }
     };
     fetchTemplate();
-  }, [id]);
+  }, [id, API_BASE_URL]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

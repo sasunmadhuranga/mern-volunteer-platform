@@ -29,24 +29,6 @@ export default function AdminTemplates() {
       });
   }, [API_BASE_URL, token]);
 
-  const handleDeactivate = async () => {
-    try {
-      await axios.delete(
-        `${API_BASE_URL}/api/certificate-templates/${selectedTemplateId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setTemplates(prev =>
-        prev.map(t =>
-          t._id === selectedTemplateId ? { ...t, isActive: false } : t
-        )
-      );
-      setShowModel(false);
-    } catch {
-      setError("Failed to deactivate template.");
-    }
-  };
-
   const handleActionClick = (id) => {
     setSelectedTemplateId(id);
     setShowModel(true);
