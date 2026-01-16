@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback  } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -50,9 +50,10 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
           .finally(() => scannerRef.current.clear());
       }
     };
-  }, []);
+  }, [handleScan]); // ✅ now safe
 
-  const handleScan = async (result) => {
+
+  const handleScan = useCallback(async (result) => {
     try {
       const parsed = JSON.parse(result);
 
@@ -90,7 +91,7 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, onComplete]);
 
   return (
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">

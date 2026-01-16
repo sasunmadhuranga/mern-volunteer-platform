@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from 'axios';
 import EventForm from "../components/EventForm";
 import { toast } from "react-toastify";
@@ -14,11 +14,8 @@ export default function OrgManageEvents(){
   const [showConfirm, setShowConfirm] = useState(false);
   const [deletingEventId, setdeletingEventId] = useState(null);
 
-  useEffect(() => {
-    fetchOrgEvents();
-  }, [API_BASE_URL]);
-
-  const fetchOrgEvents = async () => {
+  const fetchOrgEvents = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -34,10 +31,17 @@ export default function OrgManageEvents(){
       setEvents(sortedEvents);
     } catch (err) {
       console.error("Failed to fetch org events:", err);
+      setError("Failed to fetch events");
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
+
+  // ✅ Include fetchOrgEvents in dependency array
+  useEffect(() => {
+    fetchOrgEvents();
+  }, [fetchOrgEvents]);
+
 
   const handleMenuToggle = (id) => {
     setShowMenuId(prev => (prev === id ? null : id));

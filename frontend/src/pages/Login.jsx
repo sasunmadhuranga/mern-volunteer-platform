@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import axios from "axios";
@@ -18,11 +18,11 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const redirectByRole = (role) => {
+  const redirectByRole = useCallback((role) => {
     if (role === "ADMIN") navigate("/admin", { replace: true });
     else if (role === "ORG_ADMIN") navigate("/org", { replace: true });
     else navigate("/volunteer", { replace: true });
-  };
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,7 +87,8 @@ export default function Login() {
     };
 
     checkAuth();
-  }, [API_BASE_URL, navigate, setUser, setToken]);
+  }, [API_BASE_URL, setUser, setToken, redirectByRole]);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import UserProfileDisplay from '../orgadmin/UserProfileDisplay';
@@ -14,11 +14,7 @@ function OrgManageApplications() {
     const [userError, setUserError] = useState("");
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-    useEffect(() => {
-        fetchMyEvents();
-    }, []);
-
-    const fetchMyEvents = async () => {
+    const fetchMyEvents = useCallback(async () => {
         try{
             const token = localStorage.getItem("token");
             const res = await axios.get(`${API_BASE_URL}/api/events/org`, {
@@ -29,7 +25,11 @@ function OrgManageApplications() {
         catch (err){
             console.log("Failed to fetch events:", err);
         }
-    }
+    }, [API_BASE_URL]);
+
+    useEffect(() => {
+        fetchMyEvents();
+    }, [fetchMyEvents]);
 
     const handleSearch = async () => {
         if(!selectedEventId) return toast.warning("Please select an event");
