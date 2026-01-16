@@ -35,73 +35,72 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   return (
-    <>
+    <Router> {/* ✅ Wrap everything in Router */}
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* ✅ UserProvider MUST wrap Router */}
-        <UserProvider>
-          <Routes>
+      <UserProvider>
+        <Routes>
 
-            {/* Public Routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+          {/* Public Routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
 
-            {/* ORG ADMIN */}
-            <Route
-              path="/org/*"
-              element={
-                <ProtectedRoute role="ORG_ADMIN">
-                  <OrgDashboard />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<OrgContent />} />
-              <Route path="profile" element={<OrgProfile />} />
-              <Route path="addevents" element={<OrgAddEvents />} />
-              <Route path="manageevents" element={<OrgManageEvents />} />
-              <Route path="manageapplication" element={<OrgManageApplications />} />
-              <Route path="selecttemplate" element={<SelectTemplate />} />
-            </Route>
+          {/* ORG ADMIN */}
+          <Route
+            path="/org/*"
+            element={
+              <ProtectedRoute role="ORG_ADMIN">
+                <OrgDashboard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<OrgContent />} />
+            <Route path="profile" element={<OrgProfile />} />
+            <Route path="addevents" element={<OrgAddEvents />} />
+            <Route path="manageevents" element={<OrgManageEvents />} />
+            <Route path="manageapplication" element={<OrgManageApplications />} />
+            <Route path="selecttemplate" element={<SelectTemplate />} />
+          </Route>
 
-            {/* ADMIN */}
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute role="ADMIN">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AdminDashboardStats />} />
-              <Route path="eventverification" element={<EventVerification />} />
-              <Route path="templates" element={<AdminTemplates />} />
-              <Route path="create" element={<CreateTemplate />} />
-              <Route path="edit/:id" element={<EditTemplate />} />
-            </Route>
+          {/* ADMIN */}
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboardStats />} />
+            <Route path="eventverification" element={<EventVerification />} />
+            <Route path="templates" element={<AdminTemplates />} />
+            <Route path="create" element={<CreateTemplate />} />
+            <Route path="edit/:id" element={<EditTemplate />} />
+          </Route>
 
-            {/* VOLUNTEER */}
-            <Route
-              path="/volunteer/*"
-              element={
-                <ProtectedRoute role="VOLUNTEER">
-                  <VolunteerDashboard />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<EventsSection />} />
-              <Route path="volunteerprofile" element={<VolunteerProfile />} />
-              <Route path="eventregistration/:eventId" element={<EventRegistration />} />
-              <Route path="eventhistory" element={<EventHistory />} />
-              <Route path="attendance" element={<Attendance />} />
-              <Route path="attendance-history" element={<AttendanceHistory />} />
-              <Route path="certification" element={<CertificateGenerator />} />
-            </Route>
+          {/* VOLUNTEER */}
+          <Route
+            path="/volunteer/*"
+            element={
+              <ProtectedRoute role="VOLUNTEER">
+                <VolunteerDashboard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<EventsSection />} />
+            <Route path="volunteerprofile" element={<VolunteerProfile />} />
+            <Route path="eventregistration/:eventId" element={<EventRegistration />} />
+            <Route path="eventhistory" element={<EventHistory />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="attendance-history" element={<AttendanceHistory />} />
+            <Route path="certification" element={<CertificateGenerator />} />
+          </Route>
 
-          </Routes>
-        </UserProvider>
-    </>
+        </Routes>
+      </UserProvider>
+    </Router>
   );
 }
