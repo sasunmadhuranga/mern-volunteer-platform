@@ -323,16 +323,21 @@ router.get("/:eventId/qr/:date", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Normalize dates (date-only comparison)
-    const dateKey = date;
-    const startKey = event.startDate.toISOString().slice(0, 10);
-    const endKey = event.endDate.toISOString().slice(0, 10);
-
-    if (dateKey < startKey || dateKey > endKey) {
-      return res.status(403).json({
-        message: "QR not valid outside event date range"
-      });
+    // Utility to get YYYY-MM-DD in Sri Lanka timezone
+    function getSriLankaDateKey(dateObj) {
+      return new Date(dateObj).toLocaleDateString("en-CA", { timeZone: "Asia/Colombo" });
     }
+
+    // Normalize
+    const dateKey = date; // QR payload date
+    const startKey = getSriLankaDateKey(event.startDate);
+    const endKey = getSriLankaDateKey(event.endDate);
+
+    // Check if QR is within event **dates**
+    if (dateKey < startKey || dateKey > endKey) {
+      return res.status(403).json({ message: "QR not valid outside event date range" });
+    }
+
 
     // Ensure Map
     if (!(event.dailyTokens instanceof Map)) {
