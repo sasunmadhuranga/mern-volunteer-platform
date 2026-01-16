@@ -17,6 +17,55 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
     timeZone: "Asia/Colombo",
   });
 
+  // ----------------------
+  // handleScan defined first
+  // ----------------------
+  const handleScan = useCallback(
+    async (result) => {
+      try {
+        const parsed = JSON.parse(result);
+
+        if (!parsed.eventId || !parsed.date || !parsed.token || !parsed.scanType) {
+          toast.error("Invalid QR Code");
+          isRunningRef.current = true;
+          return;
+        }
+
+        setLoading(true);
+        const authToken = localStorage.getItem("token");
+
+        const res = await fetch(`${API_BASE_URL}/api/attendance/scan`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(parsed),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast.error(data.message || "Scan Failed");
+          isRunningRef.current = true;
+        } else {
+          toast.success(data.message);
+          onComplete?.(data.message);
+          navigate("/volunteer/attendance", { replace: true });
+        }
+      } catch {
+        toast.error("QR Parsing Failed");
+        isRunningRef.current = true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [navigate, onComplete] // only include dynamic dependencies
+  );
+
+  // ----------------------
+  // useEffect for scanner
+  // ----------------------
   useEffect(() => {
     const scanner = new Html5Qrcode("qr-reader");
     scannerRef.current = scanner;
@@ -50,48 +99,11 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
           .finally(() => scannerRef.current.clear());
       }
     };
-  }, [handleScan]); 
+  }, [handleScan]); // include handleScan here
 
-  const handleScan = useCallback(async (result) => {
-    try {
-      const parsed = JSON.parse(result);
-
-      if (!parsed.eventId || !parsed.date || !parsed.token || !parsed.scanType) {
-        toast.error("Invalid QR Code");
-        isRunningRef.current = true;
-        return;
-      }
-
-      setLoading(true);
-      const authToken = localStorage.getItem("token");
-
-      const res = await fetch(`${API_BASE_URL}/api/attendance/scan`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify(parsed),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.message || "Scan Failed");
-        isRunningRef.current = true;
-      } else {
-        toast.success(data.message);
-        onComplete?.(data.message);
-        navigate("/volunteer/attendance", { replace: true });
-      }
-    } catch {
-      toast.error("QR Parsing Failed");
-      isRunningRef.current = true;
-    } finally {
-      setLoading(false);
-    }
-  }, [API_BASE_URL, navigate, onComplete]);
-
+  // ----------------------
+  // Render
+  // ----------------------
   return (
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
       <div className="w-full max-w-md p-6 flex flex-col items-center bg-white rounded-xl shadow">
