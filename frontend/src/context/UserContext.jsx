@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -12,19 +12,22 @@ export function UserProvider({ children }) {
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-  const buildImageUrl = (path) => {
+  const buildImageUrl = useCallback((path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
     return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
-  };
+  }, [API_BASE_URL]);
 
-  const normalizeUser = (u) => {
-    if (!u) return null;
-    return {
-      ...u,
-      profilePicUrl: buildImageUrl(u.profilePic),
-    };
-  };
+  const normalizeUser = useCallback(
+    (u) => {
+      if (!u) return null;
+      return {
+        ...u,
+        profilePicUrl: buildImageUrl(u.profilePic),
+      };
+    },
+    [buildImageUrl]
+  );
 
   useEffect(() => {
     if (!token) {
@@ -39,8 +42,6 @@ export function UserProvider({ children }) {
       .then((res) => {
         setUser(normalizeUser(res.data.user));
       })
-
-
       .catch(() => {
         localStorage.clear();
         setUser(null);
