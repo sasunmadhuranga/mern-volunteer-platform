@@ -48,7 +48,7 @@ export function UserProvider({ children }) {
         navigate("/login");
       })
       .finally(() => setLoading(false));
-  }, [token, navigate, API_BASE_URL]);
+  }, [token, navigate, API_BASE_URL, normalizeUser]);
 
   const logout = () => {
     localStorage.clear();
