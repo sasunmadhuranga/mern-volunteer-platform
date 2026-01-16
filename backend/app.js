@@ -54,7 +54,6 @@ app.use("/api/orgtemplate", setTemplateRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/organizations", organizationRoutes);
 
-
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
