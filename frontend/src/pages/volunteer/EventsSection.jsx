@@ -153,8 +153,8 @@ export default function EventsSection() {
       </div>
 
       {loadingEvents ? (
-        <div className="flex justify-center items-center mt-6">
-          <div className="loader border-t-4 border-b-4 border-sky-600 w-12 h-12 rounded-full animate-spin"></div>
+        <div className="flex justify-center items-center mt-6 gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
           <span className="ml-2 text-gray-700">Loading events...</span>
         </div>
       ) : events.length === 0 ? (

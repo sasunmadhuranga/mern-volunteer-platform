@@ -36,10 +36,10 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               {profile.qualificationFile && (
                 <p><strong>Qualification: {" "}</strong>
                 <a
-                  href={`${API_BASE_URL}${profile.qualificationFile}`}
+                  href={profile.qualificationFile}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800 "
+                  className="text-blue-600 underline hover:text-blue-800"
                 >
                   View Document
                 </a>
