@@ -69,10 +69,10 @@ router.post("/scan", authenticateToken, async (req, res) => {
           volunteerId,
           eventApplicationId: application._id,
           date,
-          checkInTime: now,
+          checkInTime: nowColombo.toJSDate(),
         });
       } else {
-        attendance.checkInTime = now;
+        attendance.checkOutTime = nowColombo.toJSDate();
         await attendance.save();
       }
 
