@@ -129,12 +129,14 @@ export const generateCertificate = async (req, res) => {
       }
     }
 
+    /* -------------------- SIGNATURE -------------------- */
     html = html.replace(
       /{{\s*signature\s*}}/gi,
-      signatureImg
+      orgTemplate.signature
         ? `<img src="${orgTemplate.signature}" style="height:60px; display:block; margin:0 auto 10px auto;" />`
         : ""
     );
+
 
     html = html.replace(
       /{{\s*currentDate\s*}}/gi,
