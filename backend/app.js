@@ -39,18 +39,16 @@ app.use(
   })
 );
 
-// Always answer preflight
-app.options("/*", cors());
+app.use(cors());
 
 app.use(express.json());
 
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/uploads", express.static("uploads"));
 
 app.use("/api/events", eventRoutes);
-app.use("/api/events", eventQRRoutes);
+app.use("/api/event-qr", eventQRRoutes);
 app.use("/api/event-applications", eventApplicationRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/certificate-templates", certificateTemplatePublicRoutes);

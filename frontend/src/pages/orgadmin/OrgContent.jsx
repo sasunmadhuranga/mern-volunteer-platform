@@ -137,7 +137,7 @@ function QRCodeCard({ event }) {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          `${API_BASE_URL}/api/events/${event._id}/qr/${today}/${type}`,
+          `${API_BASE_URL}/api/event-qr/${event._id}/qr/${today}/${type}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         return res.data.qrImage;
