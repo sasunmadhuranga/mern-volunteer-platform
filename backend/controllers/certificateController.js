@@ -2,7 +2,7 @@ import Event from "../models/Event.js";
 import EventApplication from "../models/EventApplication.js";
 import Attendance from "../models/Attendance.js";
 import OrgCertificateTemplate from "../models/OrgCertificateTemplate.js";
-import puppeteer from "puppeteer";
+import pdf from "html-pdf-node"; 
 import path from "path";
 import User from "../models/User.js";
 import fs from "fs";
@@ -51,17 +51,6 @@ export const getEligibleEvents = async (req, res) => {
   }
 };
 
-const launchBrowser = async () => {
-  await import('puppeteer'); // ensures Puppeteer module is loaded and Chromium is available
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  return browser;
-};
-
 export const generateCertificate = async (req, res) => {
   try {
     const { eventId } = req.params;
@@ -101,19 +90,11 @@ export const generateCertificate = async (req, res) => {
         .json({ message: "No template selected by organization" });
     }
 
-    /* -------------------- TEMPLATE CSS (IMPORTANT) -------------------- */
+    /* -------------------- TEMPLATE CSS -------------------- */
     const printCSS = `
       <style>
-        @page {
-          size: A4;
-          margin: 0;
-        }
-        html, body {
-          width: 210mm;
-          height: 297mm;
-          margin: 0;
-          padding: 0;
-        }
+        @page { size: A4; margin: 0; }
+        html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; }
       </style>
     `;
 
@@ -148,33 +129,25 @@ export const generateCertificate = async (req, res) => {
       }
     }
 
+    /* -------------------- SIGNATURE -------------------- */
     html = html.replace(
       /{{\s*signature\s*}}/gi,
-      signatureImg
-        ? `<img src="${signatureImg}" style="height:60px; display:block; margin:0 auto 10px auto;" />`
+      orgTemplate.signature
+        ? `<img src="${orgTemplate.signature}" style="height:60px; display:block; margin:0 auto 10px auto;" />`
         : ""
     );
+
 
     html = html.replace(
       /{{\s*currentDate\s*}}/gi,
       new Date().toLocaleDateString()
     );
 
-    const browser = await launchBrowser();
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForSelector("#certificate");
+    /* -------------------- PDF GENERATION USING html-pdf-node -------------------- */
+    const file = { content: html };
+    const options = { format: 'A4', printBackground: true };
 
-    const bodyHandle = await page.$('#certificate');
-    const boundingBox = await bodyHandle.boundingBox();
-    const pdfBuffer = await page.pdf({
-      width: `${Math.ceil(boundingBox.width)}px`,
-      height: `${Math.ceil(boundingBox.height)}px`,
-      printBackground: true,
-      pageRanges: '1',
-    });
-    await browser.close();
-
+    const pdfBuffer = await pdf.generatePdf(file, options);
 
     res.set({
       "Content-Type": "application/pdf",
