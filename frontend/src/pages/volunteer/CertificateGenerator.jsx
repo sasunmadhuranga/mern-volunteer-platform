@@ -9,17 +9,20 @@ export default function CertificateGenerator() {
   const [loadingId, setLoadingId] = useState(null);
   const {token} = useUser();
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  const [loadingEvents, setLoadingEvents] = useState(true);
   
 
   useEffect(() => {
     if (!token) return;
 
+    setLoadingEvents(true); // start loading
     axios
       .get(`${API_BASE_URL}/api/certificates/eligible-events`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setEvents(res.data))
-      .catch(() => toast.error("Failed to fetch eligible events"));
+      .catch(() => toast.error("Failed to fetch eligible events"))
+      .finally(() => setLoadingEvents(false)); // stop loading
   }, [API_BASE_URL, token]);
 
 
@@ -63,7 +66,11 @@ export default function CertificateGenerator() {
         </div>
 
         {/* Empty State */}
-        {events.length === 0 ? (
+        {loadingEvents ? (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <p className="text-gray-600 text-lg">Loading certificates...</p>
+          </div>
+        ) : events.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <p className="text-gray-600 text-lg">
               You don’t have any eligible certificates yet.
@@ -75,37 +82,27 @@ export default function CertificateGenerator() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
             {events.map((ev) => (
-              <div
-                key={ev.eventId}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition p-6 flex flex-col justify-between"
-              >
-                {/* Event Info */}
+              <div key={ev.eventId} className="bg-white rounded-xl shadow hover:shadow-lg transition p-6 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                    {ev.eventName}
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">{ev.eventName}</h3>
                 </div>
-
-                {/* Action */}
                 <button
                   onClick={() => handleGenerate(ev.eventId, ev.eventName)}
                   disabled={loadingId === ev.eventId}
                   className={`mt-5 flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium transition
-                    ${
-                      loadingId === ev.eventId
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
+                    ${loadingId === ev.eventId
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
                   <FiDownload />
-                  {loadingId === ev.eventId
-                    ? "Generating..."
-                    : "Download Certificate"}
+                  {loadingId === ev.eventId ? "Generating..." : "Download Certificate"}
                 </button>
               </div>
             ))}
           </div>
         )}
+
       </div>
     </div>
   );

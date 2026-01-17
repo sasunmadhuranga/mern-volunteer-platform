@@ -153,13 +153,16 @@ export const generateCertificate = async (req, res) => {
     /* -------------------- PDF GENERATION -------------------- */
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: puppeteer.executablePath(), // use bundled Chromium
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], // required on Render
     });
+
 
 
 
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForSelector("#certificate");
 
     // Measure content height & width
     const bodyHandle = await page.$('#certificate');
@@ -172,10 +175,6 @@ export const generateCertificate = async (req, res) => {
     });
     await browser.close();
 
-
-
-
-    await browser.close();
 
     res.set({
       "Content-Type": "application/pdf",
