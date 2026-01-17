@@ -129,14 +129,12 @@ export const generateCertificate = async (req, res) => {
       }
     }
 
-    /* -------------------- SIGNATURE -------------------- */
     html = html.replace(
       /{{\s*signature\s*}}/gi,
-      orgTemplate.signature
+      signatureImg
         ? `<img src="${orgTemplate.signature}" style="height:60px; display:block; margin:0 auto 10px auto;" />`
         : ""
     );
-
 
     html = html.replace(
       /{{\s*currentDate\s*}}/gi,
@@ -145,9 +143,15 @@ export const generateCertificate = async (req, res) => {
 
     /* -------------------- PDF GENERATION USING html-pdf-node -------------------- */
     const file = { content: html };
-    const options = { format: 'A4', printBackground: true };
+    const options = {
+      format: 'A4',
+      landscape: true,
+      printBackground: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    };
 
-    const pdfBuffer = await pdf.generatePdf(file, options);
+const pdfBuffer = await pdf.generatePdf(file, options);
+
 
     res.set({
       "Content-Type": "application/pdf",
