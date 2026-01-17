@@ -88,7 +88,7 @@ router.post("/scan", authenticateToken, async (req, res) => {
         return res.status(400).json({ message: "Already checked out today" });
       }
 
-      attendance.checkOutTime = now;
+      attendance.checkOutTime = nowColombo.toJSDate();
       await attendance.save();
       return res.json({ message: "Checked out successfully", attendance });
     }
