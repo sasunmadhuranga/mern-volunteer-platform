@@ -57,7 +57,6 @@ router.post("/scan", authenticateToken, async (req, res) => {
 
     let attendance = await Attendance.findOne({ eventId, volunteerId, date });
 
-    // Handle check-in
     if (scanType === "check-in") {
       if (attendance?.checkInTime) {
         return res.status(400).json({ message: "Already checked in today" });
@@ -72,26 +71,30 @@ router.post("/scan", authenticateToken, async (req, res) => {
           checkInTime: nowColombo.toJSDate(),
         });
       } else {
-        attendance.checkOutTime = nowColombo.toJSDate();
+        attendance.checkInTime = nowColombo.toJSDate();
         await attendance.save();
       }
 
       return res.json({ message: "Checked in successfully", attendance });
     }
 
+
     // Handle check-out
     if (scanType === "check-out") {
       if (!attendance?.checkInTime) {
         return res.status(400).json({ message: "Cannot check out before checking in" });
       }
+
       if (attendance.checkOutTime) {
         return res.status(400).json({ message: "Already checked out today" });
       }
 
-      attendance.checkOutTime = nowColombo.toJSDate();
+      attendance.checkOutTime = nowColombo.toJSDate(); // ✅ correct
       await attendance.save();
+
       return res.json({ message: "Checked out successfully", attendance });
     }
+
 
   } catch (err) {
     console.error("Attendance scan error:", err);
