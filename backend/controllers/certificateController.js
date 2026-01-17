@@ -51,6 +51,16 @@ export const getEligibleEvents = async (req, res) => {
   }
 };
 
+const launchBrowser = async () => {
+  await import('puppeteer'); // ensures Puppeteer module is loaded and Chromium is available
+
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
+  return browser;
+};
 
 export const generateCertificate = async (req, res) => {
   try {
@@ -150,20 +160,11 @@ export const generateCertificate = async (req, res) => {
       new Date().toLocaleDateString()
     );
 
-    /* -------------------- PDF GENERATION -------------------- */
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"], // required on Render
-    });
-
-
-
-
+    const browser = await launchBrowser();
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForSelector("#certificate");
 
-    // Measure content height & width
     const bodyHandle = await page.$('#certificate');
     const boundingBox = await bodyHandle.boundingBox();
     const pdfBuffer = await page.pdf({
