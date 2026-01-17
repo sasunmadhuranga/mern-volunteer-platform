@@ -153,7 +153,6 @@ export const generateCertificate = async (req, res) => {
     /* -------------------- PDF GENERATION -------------------- */
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: puppeteer.executablePath(), // use bundled Chromium
       args: ["--no-sandbox", "--disable-setuid-sandbox"], // required on Render
     });
 
