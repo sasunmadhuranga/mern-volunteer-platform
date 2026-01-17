@@ -40,8 +40,7 @@ app.use(
 );
 
 // Always answer preflight
-app.options("*", cors());
-
+app.options("/*", cors());
 
 app.use(express.json());
 
