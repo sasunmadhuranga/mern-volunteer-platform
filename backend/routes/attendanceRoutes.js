@@ -158,6 +158,7 @@ router.get("/history/:eventId", authenticateToken, async (req, res) => {
       .sort({ date: -1 });
 
     res.json({ eventId, history: records });
+    console.log(JSON.stringify(records, null, 2)); 
   } catch (err) {
     console.error("History by event error:", err);
     res.status(500).json({ message: "Server error" });
