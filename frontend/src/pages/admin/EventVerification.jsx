@@ -33,7 +33,7 @@ export default function AdminEventVerification() {
       .catch(() => {
         setError("Failed to load events.");
         setLoading(false);
-      })
+      });
   }, [API_BASE_URL]);
 
   const updateStatus = async (id, status) => {

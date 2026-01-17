@@ -45,7 +45,7 @@ export default function OrgContent() {
           activeEvents,
           totalApplications,
         });
-        setLoading(false)
+        setLoading(false);
       } catch (err) {
         console.error("Failed to fetch org stats:", err);
         setLoading(false);
