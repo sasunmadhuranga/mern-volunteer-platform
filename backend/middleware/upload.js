@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer + Cloudinary Storage
+// Multer Cloudinary Storage
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
@@ -21,13 +21,13 @@ const storage = new CloudinaryStorage({
       resource_type = "image";
     } else if (file.fieldname === "qualificationFile") {
       folder = "qualifications";
-      resource_type = "raw"; // IMPORTANT: PDF/DOCX/other files
+      resource_type = "raw"; // PDF or other docs
     } else if (file.fieldname === "signature") {
       folder = "signatures";
       resource_type = "image";
     }
 
-    // Remove extension from public_id; Cloudinary handles it
+    // Let Cloudinary auto-detect extension, do NOT add it manually
     const public_id = `${req.user ? req.user.id : "unknown"}-${Date.now()}`;
 
     return {

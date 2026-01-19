@@ -7,18 +7,18 @@ import upload from "../middleware/upload.js"; // Cloudinary middleware
 const router = express.Router();
 
 router.post(
-  "/",
+  '/',
   authenticateToken,
-  upload.single("qualificationFile"),
+  upload.single('qualificationFile'), // handle file upload
   async (req, res) => {
     try {
       const { eventId, name, age, contactEmail, phone } = req.body;
-
-      if (!eventId || !name || !age || !contactEmail) {
+      if (!eventId || !name || !age || !contactEmail || !phone) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const qualificationFile = req.file ? req.file.path : null; // Cloudinary URL
+      // Use file URL from Cloudinary
+      const qualificationFile = req.file ? req.file.path : null; // <-- This URL is fully downloadable
 
       const application = new EventApplication({
         userId: req.user.id,
@@ -31,14 +31,10 @@ router.post(
       });
 
       await application.save();
-
-      res.json({
-        message: "Application submitted successfully",
-        application,
-      });
+      res.json({ message: 'Application submitted successfully', application });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Failed to submit application" });
+      res.status(500).json({ error: 'Failed to submit application' });
     }
   }
 );
