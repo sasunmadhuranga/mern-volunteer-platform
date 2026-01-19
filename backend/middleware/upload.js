@@ -31,7 +31,7 @@ const storage = new CloudinaryStorage({
     return {
       folder,
       resource_type, 
-      public_id: `${req.user ? req.user.id : "unknown"}-${Date.now()}`,
+      public_id: `${req.user ? req.user.id : "unknown"}-${Date.now()}.${file.originalname.split('.').pop()}`,
     };
   },
 });

@@ -37,6 +37,7 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                 <p><strong>Qualification: {" "}</strong>
                 <a
                   href={profile.qualificationFile}
+                  download={profile.qualificationFileName || `${profile.name}-qualification.pdf`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 underline hover:text-blue-800"
