@@ -65,13 +65,33 @@ router.get('/me', authenticateToken, async (req, res) => {
     const applications = await EventApplication.find({ userId: req.user.id })
       .populate('eventId')
       .sort({ createdAt: -1 });
-    
-    res.json({ applications });
+
+    // Generate signed URLs for PDFs
+    const appsWithSignedURLs = applications.map(app => {
+      let signedURL = null;
+      if (app.qualificationFile) {
+        signedURL = cloudinary.url(app.qualificationFile, {
+          resource_type: "raw",
+          sign_url: true,
+          type: "authenticated",
+          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour
+        });
+      }
+
+      return {
+        ...app.toObject(),
+        qualificationFile: signedURL
+      };
+    });
+
+    res.json({ applications: appsWithSignedURLs });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch applications" });
   }
 });
+
 
 // PATCH /api/event-applications/:id/status → Update application status
 router.patch('/:id/status', authenticateToken, async (req, res) => {
