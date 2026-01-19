@@ -33,12 +33,11 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
               <p><strong>Email:</strong> {profile.contactEmail}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
-              {profile.qualificationFile && (
+              {profile.qualificationFile?.url && (
                 <p>
                   <strong>Qualification: </strong>
                   <a
-                    href={profile.qualificationFile} // can now be public URL or signed URL
-                    download={profile.qualificationFileName || `${profile.name}-qualification.pdf`}
+                    href={profile.qualificationFile.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 underline hover:text-blue-800"
@@ -47,6 +46,7 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                   </a>
                 </p>
               )}
+
             </div>
             
           </>

@@ -3,6 +3,7 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 import EventApplication from '../models/EventApplication.js';
 import Event from "../models/Event.js";
 import upload from "../middleware/upload.js"; // Cloudinary middleware
+import { v2 as cloudinary } from "cloudinary";
 
 const router = express.Router();
 
@@ -18,7 +19,13 @@ router.post(
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const qualificationFile = req.file ? req.file.path : null; // Cloudinary URL
+      const qualificationFile = req.file
+        ? {
+            url: req.file.path,
+            public_id: req.file.filename,   // Cloudinary public_id
+            format: req.file.originalname.split('.').pop(), // preserves file extension
+          }
+        : null;
 
       const application = new EventApplication({
         userId: req.user.id,
@@ -28,30 +35,10 @@ router.post(
         contactEmail,
         phone,
         qualificationFile,
-        qualificationFileName: req.file ? req.file.originalname : null,
       });
 
       await application.save();
-
-      // --------------------------
-      // Generate signed URL for PDF
-      // --------------------------
-      let qualificationFileUrl = null;
-      if (application.qualificationFile) {
-        qualificationFileUrl = cloudinary.url(application.qualificationFile, {
-          resource_type: "raw",
-          sign_url: true,
-          type: "authenticated",
-          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour
-        });
-      }
-
-      // Return the application with signed URL
-      res.json({ 
-        message: 'Application submitted successfully', 
-        application: { ...application.toObject(), qualificationFile: qualificationFileUrl }
-      });
-
+      res.json({ message: 'Application submitted successfully', application });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to submit application' });
@@ -65,33 +52,13 @@ router.get('/me', authenticateToken, async (req, res) => {
     const applications = await EventApplication.find({ userId: req.user.id })
       .populate('eventId')
       .sort({ createdAt: -1 });
-
-    // Generate signed URLs for PDFs
-    const appsWithSignedURLs = applications.map(app => {
-      let signedURL = null;
-      if (app.qualificationFile) {
-        signedURL = cloudinary.url(app.qualificationFile, {
-          resource_type: "raw",
-          sign_url: true,
-          type: "authenticated",
-          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour
-        });
-      }
-
-      return {
-        ...app.toObject(),
-        qualificationFile: signedURL
-      };
-    });
-
-    res.json({ applications: appsWithSignedURLs });
-
+    
+    res.json({ applications });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch applications" });
   }
 });
-
 
 // PATCH /api/event-applications/:id/status → Update application status
 router.patch('/:id/status', authenticateToken, async (req, res) => {
@@ -130,6 +97,12 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!app) return res.status(404).json({ error: 'Application not found' });
+
+    if (app.qualificationFile?.public_id) {
+      const resourceType = app.qualificationFile.format === "pdf" ? "raw" : "image";
+      await cloudinary.uploader.destroy(app.qualificationFile.public_id, { resource_type: resourceType });
+    }
+
 
     res.json({ message: 'Application deleted successfully' });
   } catch (err) {
