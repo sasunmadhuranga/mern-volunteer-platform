@@ -1,5 +1,33 @@
+import axios from "axios";
+
 export default function UserProfileDisplay({ onClose, loading, error, profile }) {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        `${API_BASE_URL}/api/event-applications/download/${profile._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: "blob", // IMPORTANT
+        }
+      );
+
+      const file = new Blob([res.data], {
+        type: res.headers["content-type"],
+      });
+
+      const fileURL = window.URL.createObjectURL(file);
+      window.open(fileURL); // opens PDF/image in new tab
+    } catch (err) {
+      console.error("Download failed", err);
+    }
+  };
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -33,18 +61,15 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
               <p><strong>Email:</strong> {profile.contactEmail}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
-              {profile.qualificationFile?.url && (
-                <p>
-                  <strong>Qualification: </strong>
-                  <a
-                    href={`${API_BASE_URL}/api/event-applications/download/${profile._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View / Download Qualification
-                  </a>
-                </p>
+              {profile.qualificationFile && (
+                <button
+                  onClick={handleDownload}
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  View / Download Qualification
+                </button>
               )}
+
 
             </div>
             
