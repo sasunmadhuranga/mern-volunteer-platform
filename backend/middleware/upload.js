@@ -28,10 +28,13 @@ const storage = new CloudinaryStorage({
       resource_type = "image";
     }
 
+    const originalExtension = file.originalname.split('.').pop(); // "pdf" or "jpg"
+    const publicId = `${req.user ? req.user.id : "unknown"}-${Date.now()}.${originalExtension}`;
+
     return {
       folder,
-      resource_type, 
-      public_id: `${req.user ? req.user.id : "unknown"}-${Date.now()}`,
+      resource_type,
+      public_id: publicId,  // now includes extension
     };
   },
 });

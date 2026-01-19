@@ -39,7 +39,7 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                   href={profile.qualificationFile}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800"
+                  download
                 >
                   View Document
                 </a>
