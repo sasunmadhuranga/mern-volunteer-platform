@@ -8,25 +8,26 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `${API_BASE_URL}/api/event-applications/download/${profile._id}`,
+        `${API_BASE_URL}/api/event-applications/download/${profile.applicationId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          responseType: "blob", // IMPORTANT
+          responseType: "blob",
         }
       );
 
-      const file = new Blob([res.data], {
+      const blob = new Blob([res.data], {
         type: res.headers["content-type"],
       });
 
-      const fileURL = window.URL.createObjectURL(file);
-      window.open(fileURL); // opens PDF/image in new tab
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
     } catch (err) {
       console.error("Download failed", err);
     }
   };
+
 
 
   return (
@@ -69,7 +70,6 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                   View / Download Qualification
                 </button>
               )}
-
 
             </div>
             
