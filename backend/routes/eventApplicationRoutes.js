@@ -148,22 +148,8 @@ router.get("/download/:id", authenticateToken, async (req, res) => {
       return res.status(403).send("Not authorized");
     }
 
-    // ⬇️ Fetch directly from stored secure URL
-    const axios = await import("axios");
-    const fileResponse = await axios.default.get(
-      app.qualificationFile.url,
-      { responseType: "arraybuffer" }
-    );
-
-    const format = app.qualificationFile.format;
-
-    res.set({
-      "Content-Type":
-        format === "pdf" ? "application/pdf" : `image/${format}`,
-      "Content-Disposition": `inline; filename="qualification.${format}"`,
-    });
-
-    res.send(fileResponse.data);
+    // ✅ JUST REDIRECT
+    return res.redirect(app.qualificationFile.url);
   } catch (err) {
     console.error("DOWNLOAD ERROR:", err);
     res.status(500).send("Failed to download file");
