@@ -36,13 +36,13 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               {profile.qualificationFile && (
                 <p><strong>Qualification: {" "}</strong>
                 <a
-                  href={profile.qualificationFile}
+                  href={`${profile.qualificationFile}?fl_attachment`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  download
                 >
-                  View Document
+                  Download Qualification
                 </a>
+
                 </p>
               )}
             </div>
