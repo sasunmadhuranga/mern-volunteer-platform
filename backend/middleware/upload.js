@@ -22,7 +22,7 @@ const storage = new CloudinaryStorage({
       resource_type = "image";
     } else if (file.fieldname === "qualificationFile") {
       folder = "qualifications";
-      resource_type = "raw"; // PDF
+      resource_type = "auto";
     } else if (file.fieldname === "signature") {
       folder = "signatures";
       resource_type = "image";
