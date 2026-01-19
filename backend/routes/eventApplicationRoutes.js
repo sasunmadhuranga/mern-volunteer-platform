@@ -32,7 +32,26 @@ router.post(
       });
 
       await application.save();
-      res.json({ message: 'Application submitted successfully', application });
+
+      // --------------------------
+      // Generate signed URL for PDF
+      // --------------------------
+      let qualificationFileUrl = null;
+      if (application.qualificationFile) {
+        qualificationFileUrl = cloudinary.url(application.qualificationFile, {
+          resource_type: "raw",
+          sign_url: true,
+          type: "authenticated",
+          expires_at: Math.floor(Date.now() / 1000) + 60 * 60 // 1 hour
+        });
+      }
+
+      // Return the application with signed URL
+      res.json({ 
+        message: 'Application submitted successfully', 
+        application: { ...application.toObject(), qualificationFile: qualificationFileUrl }
+      });
+
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to submit application' });
