@@ -8,10 +8,11 @@ const eventApplicationSchema = new mongoose.Schema(
     contactEmail: { type: String, required: true },
     phone: { type: String },
     qualificationFile: {
-      url: { type: String },
-      public_id: { type: String },
-      format: { type: String },
-    },
+        url: String,
+        public_id: String,
+        format: String,
+        resource_type: String,
+      },
     appliedAt: { type: Date, default: Date.now },
     status: {
       type: String,

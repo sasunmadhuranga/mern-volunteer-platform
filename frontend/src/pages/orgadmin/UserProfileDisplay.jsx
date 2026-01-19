@@ -17,18 +17,23 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
         }
       );
 
-      const blob = new Blob([res.data], {
-        type: res.headers["content-type"],
-      });
+      const contentType =
+        res.headers["content-type"] ||
+        (profile.qualificationFile.format === "pdf"
+          ? "application/pdf"
+          : `image/${profile.qualificationFile.format}`);
+
+      const blob = new Blob([res.data], { type: contentType });
 
       const url = window.URL.createObjectURL(blob);
-      window.open(url);
+      window.open(url, "_blank");
+
+      // prevent memory leak
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch (err) {
       console.error("Download failed", err);
     }
   };
-
-
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -46,34 +51,36 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : profile ? (
-          <>
-            <div className="flex flex-col items-center space-y-4">
-              {profile.profilePic ? (
-                <img
-                  src={profile.profilePic.startsWith("http") ? profile.profilePic : `${API_BASE_URL}/${profile.profilePic}`}
-                  alt={`${profile.name} profile`}
-                  className="w-24 h-24 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-xl text-gray-600">No Image</span>
-                </div>
-              )}
-              <h2 className="text-2xl font-semibold">{profile.name}</h2>
-              <p><strong>Email:</strong> {profile.contactEmail}</p>
-              <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
-              {profile.qualificationFile && (
-                <button
-                  onClick={handleDownload}
-                  className="text-blue-600 underline hover:text-blue-800"
-                >
-                  View / Download Qualification
-                </button>
-              )}
+          <div className="flex flex-col items-center space-y-4">
+            {profile.profilePic ? (
+              <img
+                src={
+                  profile.profilePic.startsWith("http")
+                    ? profile.profilePic
+                    : `${API_BASE_URL}/${profile.profilePic}`
+                }
+                alt={`${profile.name} profile`}
+                className="w-24 h-24 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
+                <span className="text-xl text-gray-600">No Image</span>
+              </div>
+            )}
 
-            </div>
-            
-          </>
+            <h2 className="text-2xl font-semibold">{profile.name}</h2>
+            <p><strong>Email:</strong> {profile.contactEmail}</p>
+            <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
+
+            {profile.qualificationFile && (
+              <button
+                onClick={handleDownload}
+                className="text-blue-600 underline hover:text-blue-800"
+              >
+                View / Download Qualification
+              </button>
+            )}
+          </div>
         ) : (
           <p>No profile data available.</p>
         )}

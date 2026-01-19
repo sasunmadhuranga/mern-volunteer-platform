@@ -21,11 +21,13 @@ router.post(
 
       const qualificationFile = req.file
         ? {
-            url: req.file.path,
-            public_id: req.file.filename,   // Cloudinary public_id
-            format: req.file.originalname.split('.').pop(), // preserves file extension
+            url: req.file.path,          // secure Cloudinary URL
+            public_id: req.file.public_id, // REAL public_id
+            format: req.file.format,      // pdf / jpg / png
+            resource_type: req.file.resource_type,
           }
         : null;
+
 
       const application = new EventApplication({
         userId: req.user.id,
@@ -99,8 +101,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     if (!app) return res.status(404).json({ error: 'Application not found' });
 
     if (app.qualificationFile?.public_id) {
-      const resourceType = app.qualificationFile.format === "pdf" ? "raw" : "image";
-      await cloudinary.uploader.destroy(app.qualificationFile.public_id, { resource_type: resourceType });
+      await cloudinary.uploader.destroy(
+      app.qualificationFile.public_id,
+      { resource_type: app.qualificationFile.resource_type }
+    );
     }
 
 
@@ -125,7 +129,7 @@ router.get('/event/:eventId', authenticateToken, async (req, res) => {
 router.get("/download/:id", authenticateToken, async (req, res) => {
   try {
     const app = await EventApplication.findById(req.params.id);
-    if (!app || !app.qualificationFile?.public_id) {
+    if (!app || !app.qualificationFile?.url) {
       return res.status(404).send("File not found");
     }
 
@@ -144,26 +148,18 @@ router.get("/download/:id", authenticateToken, async (req, res) => {
       return res.status(403).send("Not authorized");
     }
 
-    const format = app.qualificationFile.format.toLowerCase();
-    const isPdf = format === "pdf";
-    const resourceType = isPdf ? "raw" : "image";
-
-    // ✅ REMOVE extension from public_id
-    const cleanPublicId = app.qualificationFile.public_id.replace(/\.[^/.]+$/, "");
-
-    const fileUrl = cloudinary.url(cleanPublicId, {
-      resource_type: resourceType,
-      format,
-      secure: true,
-    });
-
+    // ⬇️ Fetch directly from stored secure URL
     const axios = await import("axios");
-    const fileResponse = await axios.default.get(fileUrl, {
-      responseType: "arraybuffer",
-    });
+    const fileResponse = await axios.default.get(
+      app.qualificationFile.url,
+      { responseType: "arraybuffer" }
+    );
+
+    const format = app.qualificationFile.format;
 
     res.set({
-      "Content-Type": isPdf ? "application/pdf" : `image/${format}`,
+      "Content-Type":
+        format === "pdf" ? "application/pdf" : `image/${format}`,
       "Content-Disposition": `inline; filename="qualification.${format}"`,
     });
 
