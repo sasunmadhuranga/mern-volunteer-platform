@@ -3,7 +3,6 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 import EventApplication from '../models/EventApplication.js';
 import Event from "../models/Event.js";
 import upload from "../middleware/upload.js"; // Cloudinary middleware
-import { v2 as cloudinary } from "cloudinary";
 
 const router = express.Router();
 
@@ -19,15 +18,7 @@ router.post(
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const qualificationFile = req.file
-        ? {
-            url: req.file.path,          // secure Cloudinary URL
-            public_id: req.file.public_id, // REAL public_id
-            format: req.file.format,      // pdf / jpg / png
-            resource_type: req.file.resource_type,
-          }
-        : null;
-
+      const qualificationFile = req.file ? req.file.path : null; // Cloudinary URL
 
       const application = new EventApplication({
         userId: req.user.id,
@@ -100,14 +91,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
     if (!app) return res.status(404).json({ error: 'Application not found' });
 
-    if (app.qualificationFile?.public_id) {
-      await cloudinary.uploader.destroy(
-      app.qualificationFile.public_id,
-      { resource_type: app.qualificationFile.resource_type }
-    );
-    }
-
-
     res.json({ message: 'Application deleted successfully' });
   } catch (err) {
     console.error(err);
@@ -125,30 +108,5 @@ router.get('/event/:eventId', authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch applications" });
   }
 });
-
-router.get("/download/:id", authenticateToken, async (req, res) => {
-    const app = await EventApplication.findById(req.params.id);
-    if (!app?.qualificationFile?.public_id) return res.status(404).send("File not found");
-
-    // Check authorization (owner or org admin)
-    const isOwner = app.userId.toString() === req.user.id;
-    let isOrgAdmin = false;
-    if (req.user.role === "ORG_ADMIN") {
-        const event = await Event.findById(app.eventId);
-        if (event && event.createdBy.toString() === req.user.id) isOrgAdmin = true;
-    }
-    if (!isOwner && !isOrgAdmin) return res.status(403).send("Unauthorized");
-
-    // Use Cloudinary signed URL
-    const url = cloudinary.url(app.qualificationFile.public_id, {
-        resource_type: "raw",
-        type: "authenticated",  // ensures a signed URL
-        attachment: true,       // force download
-    });
-
-    return res.json({ url });
-});
-
-
 
 export default router;

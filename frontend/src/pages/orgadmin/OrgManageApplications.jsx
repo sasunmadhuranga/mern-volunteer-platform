@@ -68,7 +68,7 @@ function OrgManageApplications() {
         toast.error("Failed to update application status");
         }
     };
-    const handleClick = async (userId, application) => {
+    const handleClick = async (userId, qualificationFile) => {
         setShowUserDetails(true);
         setUserLoading(true);
         setUserError("");
@@ -78,12 +78,7 @@ function OrgManageApplications() {
             const res = await axios.get(`${API_BASE_URL}/api/users/${userId}`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
-            setUserDetails({
-            ...res.data.user,
-            qualificationFile: application.qualificationFile,
-            applicationId: application._id,
-            });
-
+            setUserDetails({...res.data.user, qualificationFile});
         }
         catch(err){
             console.log("Error fetching user details.", err);
@@ -149,7 +144,7 @@ function OrgManageApplications() {
                                 <div className="flex justify-between items-center">
                                     <p>{index + 1}.</p>
                                     <button 
-                                    onClick={() => handleClick(app.userId._id, app)}
+                                    onClick={() => {handleClick(app.userId._id, app.qualificationFile)}} 
                                     className="text-lg font-medium text-gray-700 hover:underline ml-1">
                                         {app.userId.name}
                                     </button>

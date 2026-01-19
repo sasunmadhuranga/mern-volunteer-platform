@@ -7,12 +7,7 @@ const eventApplicationSchema = new mongoose.Schema(
     age: { type: Number, required: true },
     contactEmail: { type: String, required: true },
     phone: { type: String },
-    qualificationFile: {
-        url: String,
-        public_id: String,
-        format: String,
-        resource_type: String,
-      },
+    qualificationFile: { type: String }, // store file path
     appliedAt: { type: Date, default: Date.now },
     status: {
       type: String,
