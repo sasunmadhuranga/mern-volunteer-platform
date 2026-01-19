@@ -1,16 +1,36 @@
 import React from "react";
-
+import axios from "axios";
 export default function UserProfileDisplay({ onClose, loading, error, profile }) {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-  // ✅ Simply open the download URL in a new tab
-  const handleDownload = () => {
-    if (!profile || !profile.applicationId) return;
-    window.open(
+  const handleDownload = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Not logged in");
+
+    const res = await axios.get(
       `${API_BASE_URL}/api/event-applications/download/${profile.applicationId}`,
-      "_blank"
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      }
     );
-  };
+
+    const contentType = res.headers["content-type"] || "application/pdf";
+    const blob = new Blob([res.data], { type: contentType });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `qualification.${profile.qualificationFile.format || "pdf"}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Download failed", err);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
