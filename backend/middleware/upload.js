@@ -9,37 +9,33 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Cloudinary storage for multer
+// Multer + Cloudinary Storage
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
     let folder = "general";
     let resource_type = "image"; // default
 
-    // Determine folder and type based on fieldname
     if (file.fieldname === "profilePic") {
       folder = "profilePics";
       resource_type = "image";
     } else if (file.fieldname === "qualificationFile") {
       folder = "qualifications";
-      resource_type = "auto";
+      resource_type = "raw"; // IMPORTANT: PDF/DOCX/other files
     } else if (file.fieldname === "signature") {
       folder = "signatures";
       resource_type = "image";
     }
 
-    const originalExtension = file.originalname.split('.').pop(); // "pdf" or "jpg"
-    const publicId = `${req.user ? req.user.id : "unknown"}-${Date.now()}.${originalExtension}`;
+    // Remove extension from public_id; Cloudinary handles it
+    const public_id = `${req.user ? req.user.id : "unknown"}-${Date.now()}`;
 
     return {
       folder,
       resource_type,
-      public_id: publicId,  // now includes extension
+      public_id,
     };
   },
 });
 
-// Export multer upload middleware
 export default multer({ storage });
-
-

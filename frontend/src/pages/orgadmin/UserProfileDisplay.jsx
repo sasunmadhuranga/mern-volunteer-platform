@@ -34,17 +34,20 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
               <p><strong>Email:</strong> {profile.contactEmail}</p>
               <p><strong>Phone:</strong> {profile.phone || "N/A"}</p>
               {profile.qualificationFile && (
-                <p><strong>Qualification: {" "}</strong>
-                <a
-                  href={`${profile.qualificationFile}?fl_attachment`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download Qualification
-                </a>
-
+                <p>
+                  <strong>Qualification: </strong>
+                  <a
+                    href={profile.qualificationFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline hover:text-blue-800"
+                    download
+                  >
+                    View / Download Document
+                  </a>
                 </p>
               )}
+
             </div>
             
           </>

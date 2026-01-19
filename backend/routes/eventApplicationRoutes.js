@@ -6,15 +6,15 @@ import upload from "../middleware/upload.js"; // Cloudinary middleware
 
 const router = express.Router();
 
-// POST /api/event-applications → upload qualification PDF
 router.post(
-  '/',
+  "/",
   authenticateToken,
-  upload.single('qualificationFile'), // Cloudinary
+  upload.single("qualificationFile"),
   async (req, res) => {
     try {
       const { eventId, name, age, contactEmail, phone } = req.body;
-      if (!eventId || !name || !age || !contactEmail || !phone) {
+
+      if (!eventId || !name || !age || !contactEmail) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
@@ -31,13 +31,18 @@ router.post(
       });
 
       await application.save();
-      res.json({ message: 'Application submitted successfully', application });
+
+      res.json({
+        message: "Application submitted successfully",
+        application,
+      });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Failed to submit application' });
+      res.status(500).json({ error: "Failed to submit application" });
     }
   }
 );
+
 
 // Get applications for the logged-in user
 router.get('/me', authenticateToken, async (req, res) => {
