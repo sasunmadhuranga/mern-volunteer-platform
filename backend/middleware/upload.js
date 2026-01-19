@@ -13,32 +13,27 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => {
-    // Set folder and resource_type based on fieldname
     let folder = "general";
-    let resource_type = "image";
+    let resource_type = "image"; // default
 
     if (file.fieldname === "profilePic") {
       folder = "profilePics";
       resource_type = "image";
     } else if (file.fieldname === "qualificationFile") {
       folder = "qualifications";
-      resource_type = "raw"; // PDF or docs
+      resource_type = "raw"; // PDF or other docs
     } else if (file.fieldname === "signature") {
       folder = "signatures";
       resource_type = "image";
     }
 
-    // Get original file extension
-    const originalExtension = file.originalname.split('.').pop(); // "pdf" or "jpg"
-
-    // Create a unique public_id without dot
-    const publicId = `${req.user ? req.user.id : "unknown"}-${Date.now()}`;
+    // Let Cloudinary auto-detect extension, do NOT add it manually
+    const public_id = `${req.user ? req.user.id : "unknown"}-${Date.now()}`;
 
     return {
       folder,
       resource_type,
-      public_id: publicId,
-      format: originalExtension, // ensures Cloudinary URL has correct extension
+      public_id,
     };
   },
 });
