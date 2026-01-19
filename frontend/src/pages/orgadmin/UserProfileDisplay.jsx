@@ -37,12 +37,11 @@ export default function UserProfileDisplay({ onClose, loading, error, profile })
                 <p>
                   <strong>Qualification: </strong>
                   <a
-                    href={profile.qualificationFile.url}
+                    href={`${API_BASE_URL}/api/event-applications/download/${application._id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline hover:text-blue-800"
                   >
-                    View Document
+                    View / Download Qualification
                   </a>
                 </p>
               )}

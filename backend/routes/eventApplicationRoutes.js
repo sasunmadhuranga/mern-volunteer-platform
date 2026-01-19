@@ -122,4 +122,24 @@ router.get('/event/:eventId', authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/download/:id", authenticateToken, async (req, res) => {
+  const app = await EventApplication.findById(req.params.id);
+  if (!app || !app.qualificationFile?.public_id) return res.status(404).send("File not found");
+
+  const format = app.qualificationFile.format.toLowerCase();
+  const isPdf = format === "pdf";
+  const resourceType = isPdf ? "raw" : "image";
+  const url = cloudinary.url(app.qualificationFile.public_id, { resource_type: resourceType, format, secure: true });
+
+  const axios = require('axios');
+  const fileResponse = await axios.get(url, { responseType: 'arraybuffer' });
+
+  res.set({
+    'Content-Type': isPdf ? 'application/pdf' : `image/${format}`,
+    'Content-Disposition': `inline; filename="qualification.${format}"`,
+  });
+  res.send(fileResponse.data);
+});
+
+
 export default router;
