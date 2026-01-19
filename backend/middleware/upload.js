@@ -30,8 +30,12 @@ const storage = new CloudinaryStorage({
 
     return {
       folder,
-      resource_type, 
+      resource_type,
       public_id: `${req.user ? req.user.id : "unknown"}-${Date.now()}.${file.originalname.split('.').pop()}`,
+      use_filename: true,      
+      unique_filename: false, 
+      overwrite: true,
+      type: "upload",
     };
   },
 });
