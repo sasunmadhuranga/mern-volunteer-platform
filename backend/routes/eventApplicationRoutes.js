@@ -127,34 +127,28 @@ router.get('/event/:eventId', authenticateToken, async (req, res) => {
 });
 
 router.get("/download/:id", authenticateToken, async (req, res) => {
-  try {
     const app = await EventApplication.findById(req.params.id);
-    if (!app || !app.qualificationFile?.url) {
-      return res.status(404).send("File not found");
-    }
+    if (!app?.qualificationFile?.public_id) return res.status(404).send("File not found");
 
-    // Authorization
+    // Check authorization (owner or org admin)
     const isOwner = app.userId.toString() === req.user.id;
-    let isOrgAdminOfEvent = false;
-
+    let isOrgAdmin = false;
     if (req.user.role === "ORG_ADMIN") {
-      const event = await Event.findById(app.eventId);
-      if (event && event.createdBy.toString() === req.user.id) {
-        isOrgAdminOfEvent = true;
-      }
+        const event = await Event.findById(app.eventId);
+        if (event && event.createdBy.toString() === req.user.id) isOrgAdmin = true;
     }
+    if (!isOwner && !isOrgAdmin) return res.status(403).send("Unauthorized");
 
-    if (!isOwner && !isOrgAdminOfEvent) {
-      return res.status(403).send("Not authorized");
-    }
+    // Use Cloudinary signed URL
+    const url = cloudinary.url(app.qualificationFile.public_id, {
+        resource_type: "raw",
+        type: "authenticated",  // ensures a signed URL
+        attachment: true,       // force download
+    });
 
-    // ✅ JUST REDIRECT
-    return res.redirect(app.qualificationFile.url);
-  } catch (err) {
-    console.error("DOWNLOAD ERROR:", err);
-    res.status(500).send("Failed to download file");
-  }
+    return res.json({ url });
 });
+
 
 
 export default router;
