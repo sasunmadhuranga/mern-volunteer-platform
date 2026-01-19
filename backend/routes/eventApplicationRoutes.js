@@ -123,46 +123,56 @@ router.get('/event/:eventId', authenticateToken, async (req, res) => {
 });
 
 router.get("/download/:id", authenticateToken, async (req, res) => {
-  const app = await EventApplication.findById(req.params.id);
-
-  if (!app || !app.qualificationFile?.public_id) return res.status(404).send("File not found");
-
-  // Only the owner OR org-admin of the event can download
-  const isOwner = app.userId.toString() === req.user.id;
-  let isOrgAdminOfEvent = false;
-
-  if (req.user.role === "ORG_ADMIN") {
-    const event = await Event.findById(app.eventId);
-    if (event && event.createdBy.toString() === req.user.id) {
-      isOrgAdminOfEvent = true;
+  try {
+    const app = await EventApplication.findById(req.params.id);
+    if (!app || !app.qualificationFile?.public_id) {
+      return res.status(404).send("File not found");
     }
+
+    // Authorization
+    const isOwner = app.userId.toString() === req.user.id;
+    let isOrgAdminOfEvent = false;
+
+    if (req.user.role === "ORG_ADMIN") {
+      const event = await Event.findById(app.eventId);
+      if (event && event.createdBy.toString() === req.user.id) {
+        isOrgAdminOfEvent = true;
+      }
+    }
+
+    if (!isOwner && !isOrgAdminOfEvent) {
+      return res.status(403).send("Not authorized");
+    }
+
+    const format = app.qualificationFile.format.toLowerCase();
+    const isPdf = format === "pdf";
+    const resourceType = isPdf ? "raw" : "image";
+
+    // ✅ REMOVE extension from public_id
+    const cleanPublicId = app.qualificationFile.public_id.replace(/\.[^/.]+$/, "");
+
+    const fileUrl = cloudinary.url(cleanPublicId, {
+      resource_type: resourceType,
+      format,
+      secure: true,
+    });
+
+    const axios = await import("axios");
+    const fileResponse = await axios.default.get(fileUrl, {
+      responseType: "arraybuffer",
+    });
+
+    res.set({
+      "Content-Type": isPdf ? "application/pdf" : `image/${format}`,
+      "Content-Disposition": `inline; filename="qualification.${format}"`,
+    });
+
+    res.send(fileResponse.data);
+  } catch (err) {
+    console.error("DOWNLOAD ERROR:", err);
+    res.status(500).send("Failed to download file");
   }
-
-  if (!isOwner && !isOrgAdminOfEvent) {
-    return res.status(403).send("Not authorized to view this file");
-  }
-
-  const format = app.qualificationFile.format.toLowerCase();
-  const isPdf = format === "pdf";
-  const resourceType = isPdf ? "raw" : "image";
-
-  // Generate signed Cloudinary URL
-  const url = cloudinary.url(app.qualificationFile.public_id, {
-    resource_type: resourceType,
-    format,
-    secure: true,
-  });
-
-  const axios = require("axios");
-  const fileResponse = await axios.get(url, { responseType: "arraybuffer" });
-
-  res.set({
-    "Content-Type": isPdf ? "application/pdf" : `image/${format}`,
-    "Content-Disposition": `inline; filename="qualification.${format}"`,
-  });
-  res.send(fileResponse.data);
 });
-
 
 
 export default router;
