@@ -92,7 +92,7 @@ export default function VolunteerProfile() {
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6 relative">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Volunteer Profile</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Profile</h2>
           {!isEditing ? (
             <button onClick={() => setIsEditing(true)} className="text-sky-600 hover:underline font-medium">Edit</button>
           ) : (
