@@ -59,20 +59,26 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm flex justify-between items-center px-20 py-4 w-full mx-auto">
-        <h1 className="text-2xl font-bold bg-gradient-to-br from-violet-600 to-blue-700 bg-clip-text text-transparent">VolunteerHub</h1>
-        <div className="space-x-4">
-          <Link to="/login" className="text-gray-700 hover:text-sky-600">
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700"
-          >
-            Sign up
-          </Link>
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-4">
+          <h1 className="text-2xl font-bold bg-gradient-to-br from-violet-600 to-blue-700 bg-clip-text text-transparent">
+            VolunteerHub
+          </h1>
+
+          <div className="space-x-4">
+            <Link to="/login" className="text-gray-700 hover:text-sky-600">
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700"
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
       </header>
+
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-violet-600 to-blue-700 text-white py-24 px-6">

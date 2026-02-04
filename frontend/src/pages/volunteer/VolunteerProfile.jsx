@@ -7,7 +7,7 @@ import { useUser } from "../../context/UserContext";
 
 export default function VolunteerProfile() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-  const { user, setUser, token } = useUser(); // get user & token from context
+  const { user, setUser, token } = useUser(); 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
   const [birthday, setBirthday] = useState(user?.birthday || "");
@@ -64,7 +64,7 @@ export default function VolunteerProfile() {
 
       setSuccess("Profile updated successfully.");
       const updatedUser = res.data.user;
-      setUser(updatedUser); // update context
+      setUser(updatedUser); 
       setPreview(null);
       setProfilePicFile(null);
       setIsEditing(false);

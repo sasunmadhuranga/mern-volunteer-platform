@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useUser } from "../../context/UserContext";
 
 export default function OrgNavbar() {
-  const { user, loading, logout } = useUser(); // ✅ shared state
+  const { user, loading, logout } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
@@ -21,7 +21,6 @@ export default function OrgNavbar() {
   return (
     <div className="sticky top-0 z-50 bg-blue-700 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">
       
-      {/* Left side: Profile picture + name */}
       <NavLink to="/org/profile" className="flex items-center space-x-3">
         {user.profilePicUrl ? (
           <img
@@ -41,7 +40,6 @@ export default function OrgNavbar() {
         </span>
       </NavLink>
 
-      {/* Desktop Nav Links */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
         <NavLink to="/org" end className={navClass}>Dashboard</NavLink>
         <NavLink to="/org/profile" end className={navClass}>Profile</NavLink>
@@ -60,7 +58,6 @@ export default function OrgNavbar() {
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-700 md:hidden">
           <div className="flex flex-col items-center gap-4 py-4 text-gray-100">

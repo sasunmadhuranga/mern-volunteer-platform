@@ -61,7 +61,6 @@ function OrgManageApplications() {
             }
         );
         toast.success(`Application ${newStatus}`);
-        // Refresh list
         handleSearch();
         } catch (err) {
         console.error("Failed to update status:", err);
@@ -72,7 +71,6 @@ function OrgManageApplications() {
         setShowUserDetails(true);
         setUserLoading(true);
         setUserError("");
-
         try{
             const token = localStorage.getItem("token");
             const res = await axios.get(`${API_BASE_URL}/api/users/${userId}`, {
@@ -92,10 +90,8 @@ function OrgManageApplications() {
 
     return (
             <div className="bg-sky-100 px-4 py-12 md:px-20 lg:px-40 min-h-screen">
-                {/* Search Section */}
                 <div className="flex flex-col items-center space-y-4 mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 w-full max-w-2xl">
-                    {/* Dropdown */}
                     <div className="flex flex-col md:flex-row md:items-center md:space-x-2 w-full">
                     <label className="text-gray-700 mb-1 md:mb-0 md:mr-2 whitespace-nowrap">
                         Event Name
@@ -114,7 +110,6 @@ function OrgManageApplications() {
                     </select>
                     </div>
 
-                    {/* Search Button */}
                     <div className="w-full md:w-auto">
                     <button
                         onClick={handleSearch}
@@ -126,7 +121,6 @@ function OrgManageApplications() {
                 </div>
                 </div>
 
-                {/* Applications Section */}
                 <div className="flex justify-center">
                 <div className="w-full max-w-3xl">
                     {loading ? (

@@ -180,7 +180,6 @@ router.get("/search", authenticateToken, async (req, res) => {
   }
 });
 
-// Get events created by the current ORG_ADMIN
 router.get("/org", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "ORG_ADMIN") {
@@ -198,7 +197,7 @@ router.get("/org", authenticateToken, async (req, res) => {
   }
 });
 
-// Update Event (ORG_ADMIN only)
+
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "ORG_ADMIN") {
@@ -220,12 +219,10 @@ router.put("/:id", authenticateToken, async (req, res) => {
       minDay,
     } = req.body;
 
-    // Basic validation
     if (!eventName || !startDate || !endTime || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Fetch event to verify ownership
     const event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -235,7 +232,6 @@ router.put("/:id", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "You are not authorized to update this event" });
     }
 
-    // Only update allowed fields
     event.eventName = eventName;
     event.startDate = startDate;
     event.endDate = endDate;
@@ -258,7 +254,6 @@ router.put("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Delete Event (ORG_ADMIN only)
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "ORG_ADMIN") {
@@ -275,7 +270,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "You are not authorized to delete this event" });
     }
 
-    await event.deleteOne();  // or use `await Event.findByIdAndDelete(req.params.id);`
+    await event.deleteOne();  // or `await Event.findByIdAndDelete(req.params.id);`
     res.json({ message: "Event deleted successfully" });
 
   } catch (err) {
@@ -284,7 +279,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Get single event by ID (for edit form)
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -292,8 +286,6 @@ router.get("/:id", authenticateToken, async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
-
-    // Optional: Check if user is the creator (ORG_ADMIN only)
     if (req.user.role === "ORG_ADMIN" && event.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: "You are not authorized to view this event" });
     }

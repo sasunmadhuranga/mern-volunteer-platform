@@ -54,7 +54,6 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
-// PATCH /api/event-applications/:id/status → Update application status
 router.patch('/:id/status', authenticateToken, async (req, res) => {
   try {
     const { status } = req.body;
@@ -99,7 +98,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// GET /api/event-applications/event/:eventId
 router.get('/event/:eventId', authenticateToken, async (req, res) => {
   try {
     const applications = await EventApplication.find({ eventId: req.params.eventId })

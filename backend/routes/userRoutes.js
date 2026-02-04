@@ -18,7 +18,7 @@ router.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
-// Get user by ID
+
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-passwordHash");

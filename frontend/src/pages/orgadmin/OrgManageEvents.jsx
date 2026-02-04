@@ -9,7 +9,7 @@ export default function OrgManageEvents(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showMenuId, setShowMenuId] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null); // 🔧 Track editing event
+  const [editingEvent, setEditingEvent] = useState(null); 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [showConfirm, setShowConfirm] = useState(false);
   const [deletingEventId, setdeletingEventId] = useState(null);
@@ -37,7 +37,6 @@ export default function OrgManageEvents(){
     }
   }, [API_BASE_URL]);
 
-  // ✅ Include fetchOrgEvents in dependency array
   useEffect(() => {
     fetchOrgEvents();
   }, [fetchOrgEvents]);
@@ -55,7 +54,7 @@ export default function OrgManageEvents(){
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setEditingEvent(res.data.data); // Use full event data
+        setEditingEvent(res.data.data); 
         setShowMenuId(null);
       } catch (err) {
         console.error("Failed to fetch full event data:", err);
@@ -83,7 +82,6 @@ export default function OrgManageEvents(){
 
       if (res.status === 200) {
         toast.success("Event updated successfully");
-        // Refresh event list
         fetchOrgEvents();
         setEditingEvent(null);
       }
@@ -112,7 +110,7 @@ export default function OrgManageEvents(){
 
       if (res.status === 200) {
         toast.success("Event deleted successfully");
-        fetchOrgEvents(); // Refresh the event list
+        fetchOrgEvents(); 
       }
     } catch (err) {
       console.error("Failed to delete event:", err);
@@ -148,7 +146,6 @@ return (
     <div className="w-full max-w-5xl relative">
       <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">{editingEvent ? "Edit Event" : "Events Published"}</h1>
 
-      {/* ✅ Show Edit Form if editing */}
       {editingEvent ? (
         <div className="w-full bg-white p-6 rounded-xl shadow-md mb-8">
           <div className="flex justify-between items-center mb-6">
@@ -170,7 +167,6 @@ return (
           {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
         </div>
       ) : (
-        // ✅ Show Events Grid if not editing
         <>
           {events.length === 0 ? (
             <p className="text-gray-600 text-center">You haven't published any events yet.</p>
