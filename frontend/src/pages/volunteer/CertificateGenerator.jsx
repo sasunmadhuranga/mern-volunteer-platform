@@ -15,14 +15,14 @@ export default function CertificateGenerator() {
   useEffect(() => {
     if (!token) return;
 
-    setLoadingEvents(true); // start loading
+    setLoadingEvents(true); 
     axios
       .get(`${API_BASE_URL}/api/certificates/eligible-events`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setEvents(res.data))
       .catch(() => toast.error("Failed to fetch eligible events"))
-      .finally(() => setLoadingEvents(false)); // stop loading
+      .finally(() => setLoadingEvents(false)); 
   }, [API_BASE_URL, token]);
 
 
@@ -57,7 +57,7 @@ export default function CertificateGenerator() {
   return (
     <div className="min-h-screen bg-slate-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+
         <div className="flex items-center gap-3 mb-8">
           <FiAward className="text-blue-600 text-3xl" />
           <h2 className="text-3xl font-bold text-gray-800">
@@ -65,7 +65,6 @@ export default function CertificateGenerator() {
           </h2>
         </div>
 
-        {/* Empty State */}
         {loadingEvents ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <p className="text-gray-600 text-lg">Loading certificates...</p>

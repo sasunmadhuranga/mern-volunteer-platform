@@ -12,7 +12,6 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// REGISTER (already implemented)
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -33,7 +32,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// LOGIN (with JWT)
+
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -44,11 +43,10 @@ router.post('/login', async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) return res.status(401).json({ message: 'Invalid email or password' });
 
-    // Create JWT token
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET,   // Put a strong secret in your .env file
-      { expiresIn: '2h' }       // Token expires in 2 hour
+      process.env.JWT_SECRET,   
+      { expiresIn: '2h' }      
     );
 
     res.json({
@@ -68,8 +66,8 @@ router.post('/login', async (req, res) => {
 
 router.get("/me", authenticateToken, async (req, res) => {
   try {
-    // req.user comes from authenticateToken middleware
-    const user = await User.findById(req.user.id).select("-passwordHash"); // hide password
+    
+    const user = await User.findById(req.user.id).select("-passwordHash"); 
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({ user });
@@ -79,17 +77,12 @@ router.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
-// -------------------
-// SENDINBLUE SETUP
-// -------------------
+
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
 const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
-// -------------------
-// FORGOT PASSWORD
-// -------------------
 router.post("/forgot-password", async (req, res) => {
   try {
     const email = req.body.email.toLowerCase().trim();
@@ -126,9 +119,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 
-// -------------------
-// RESET PASSWORD
-// -------------------
+
 router.post("/reset-password/:token", async (req, res) => {
   try {
     const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");

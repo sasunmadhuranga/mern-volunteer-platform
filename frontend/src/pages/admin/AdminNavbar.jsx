@@ -56,7 +56,6 @@ export default function AdminNavbar() {
         className="w-14 h-14 rounded-full object-cover border"
       />
 
-      {/* Desktop Menu */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
         <NavLink to="/admin" end className={navClass}>Dashboard</NavLink>
         <NavLink to="/admin/eventverification" end className={navClass}>Events</NavLink>
@@ -64,7 +63,6 @@ export default function AdminNavbar() {
         <button onClick={handleLogout}>Logout</button>
       </div>
 
-      {/* Mobile Menu Button */}
       <button
         className="md:hidden text-2xl text-gray-100"
         onClick={() => setMenuOpen(!menuOpen)}
@@ -72,7 +70,6 @@ export default function AdminNavbar() {
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-700 md:hidden">
           <div className="flex flex-col items-center gap-4 py-4 text-gray-100">

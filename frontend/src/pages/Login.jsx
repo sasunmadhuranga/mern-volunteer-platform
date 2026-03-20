@@ -39,15 +39,12 @@ export default function Login() {
         setMessage("Login successful!");
         setMessageType("success");
 
-        // Save token & user
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Update context
         setUser(data.user);
         setToken(data.token);
 
-        // Redirect based on role
         redirectByRole(data.user.role);
 
       } else {
@@ -64,7 +61,7 @@ export default function Login() {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
-      if (!token) return; // not logged in
+      if (!token) return; 
 
       try {
         const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
@@ -73,16 +70,16 @@ export default function Login() {
 
         const user = res.data.user;
 
-        // Update context
+        
         setUser(user);
         setToken(token);
 
-        // Redirect
+       
         redirectByRole(user.role);
 
       } catch (err) {
         console.log("Token invalid or expired", err);
-        localStorage.removeItem("token"); // clear invalid token
+        localStorage.removeItem("token"); 
       }
     };
 

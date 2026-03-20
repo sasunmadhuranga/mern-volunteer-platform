@@ -5,7 +5,6 @@ import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-// Get logged-in user profile
 router.get("/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-passwordHash");
@@ -31,11 +30,11 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Update profile (including profilePic upload to Cloudinary)
+
 router.put(
   "/update",
   authenticateToken,
-  upload.single("profilePic"), // Cloudinary storage
+  upload.single("profilePic"), 
   async (req, res) => {
     try {
       const {
@@ -54,7 +53,7 @@ router.put(
       const user = await User.findById(req.user.id);
       if (!user) return res.status(404).json({ message: "User not found" });
 
-      // Update user fields
+      
       if (name) user.name = name;
       if (email) user.email = email;
       if (contactEmail !== undefined) user.contactEmail = contactEmail;
@@ -65,12 +64,12 @@ router.put(
       if (address !== undefined) user.address = address;
       if (city !== undefined) user.city = city;
 
-      // Remove profilePic if requested
+    
       if (removeProfilePic === "true") {
         user.profilePic = null;
       }
 
-      // Upload new profilePic to Cloudinary
+   
       if (req.file && req.file.path) {
         user.profilePic = req.file.path; // Cloudinary URL
       }

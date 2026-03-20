@@ -9,10 +9,9 @@ const router = express.Router();
 
 router.post("/scan", authenticateToken, async (req, res) => {
   try {
-    const { eventId, date, token, scanType } = req.body; // frontend no longer decides
+    const { eventId, date, token, scanType } = req.body; 
     const volunteerId = req.user.id;
 
-    // Validate scanType
     if (!["check-in", "check-out"].includes(scanType)) {
       return res.status(400).json({ message: "Invalid scan type" });
     }
@@ -20,7 +19,6 @@ router.post("/scan", authenticateToken, async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    // Convert dailyTokens to Map if needed
     if (!(event.dailyTokens instanceof Map)) {
       event.dailyTokens = new Map(Object.entries(event.dailyTokens || {}));
     }
@@ -30,7 +28,6 @@ router.post("/scan", authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired QR code" });
     }
 
-    // Validate event date
     const scanDate = new Date(date);
     if (scanDate < event.startDate || scanDate > event.endDate) {
       return res.status(403).json({ message: "QR code not valid for this day" });
@@ -45,7 +42,7 @@ router.post("/scan", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "QR scan is outside event time" });
     }
 
-    // Check if volunteer is approved
+
     const application = await EventApplication.findOne({
       userId: volunteerId,
       eventId,
@@ -57,7 +54,6 @@ router.post("/scan", authenticateToken, async (req, res) => {
 
     let attendance = await Attendance.findOne({ eventId, volunteerId, date });
 
-    // Handle check-in
     if (scanType === "check-in") {
       if (attendance?.checkInTime) {
         return res.status(400).json({ message: "Already checked in today" });
@@ -79,7 +75,6 @@ router.post("/scan", authenticateToken, async (req, res) => {
       return res.json({ message: "Checked in successfully", attendance });
     }
 
-    // Handle check-out
     if (scanType === "check-out") {
       if (!attendance?.checkInTime) {
         return res.status(400).json({ message: "Cannot check out before checking in" });
@@ -122,7 +117,7 @@ router.get("/history/grouped", authenticateToken, async (req, res) => {
 
     const records = await Attendance.find({ volunteerId })
       .populate("eventId", "eventName")
-      .sort({ date: 1 }); // oldest → newest
+      .sort({ date: 1 }); 
 
     const grouped = {};
 

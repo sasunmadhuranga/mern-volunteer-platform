@@ -40,14 +40,12 @@ export default function App() {
 
       <UserProvider>
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
 
-          {/* ORG ADMIN */}
           <Route
             path="/org/*"
             element={
@@ -64,7 +62,6 @@ export default function App() {
             <Route path="selecttemplate" element={<SelectTemplate />} />
           </Route>
 
-          {/* ADMIN */}
           <Route
             path="/admin/*"
             element={
@@ -80,7 +77,6 @@ export default function App() {
             <Route path="edit/:id" element={<EditTemplate />} />
           </Route>
 
-          {/* VOLUNTEER */}
           <Route
             path="/volunteer/*"
             element={

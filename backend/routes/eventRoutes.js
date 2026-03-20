@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
-import Event from "../models/Event.js";  // <-- make sure Event model exists
+import Event from "../models/Event.js";  
 import QRCode from 'qrcode';
 import * as crypto from 'crypto';
 
@@ -27,7 +27,7 @@ router.post("/add", authenticateToken, async (req, res) => {
       minDay,
     } = req.body;
 
-    // ✅ basic validation
+
     if (!eventType || !eventName || !institute || !location || !city || !startDate || !endDate || !startTime || !endTime || !opportunity || !minAge || !maxAge || !description || !qualification || !minDay) {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
@@ -35,7 +35,7 @@ router.post("/add", authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "Qualification type is required when qualification is 'Required'" });
     }
 
-    // ✅ create event
+    
     const event = new Event({
       eventType,
       eventName,
@@ -53,7 +53,7 @@ router.post("/add", authenticateToken, async (req, res) => {
       qualification,
       qualificationType,
       minDay,
-      createdBy: req.user.id, // org id
+      createdBy: req.user.id, 
     });
 
     await event.save();
@@ -93,7 +93,7 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
 });
 
 
-// 🌍 Public events (Landing Page)
+
 router.get("/public", async (req, res) => {
   try {
     const today = new Date();
@@ -103,7 +103,7 @@ router.get("/public", async (req, res) => {
       status: "approved",
       endDate: { $gte: today }
     })
-      .sort({ startDate: 1 }) // nearest events first
+      .sort({ startDate: 1 }) 
       .limit(6)
       .populate("createdBy", "name _id");
 
@@ -147,15 +147,14 @@ router.get("/search", authenticateToken, async (req, res) => {
       query.status = "approved";
     }
 
-    // Populate createdBy to get org user info (name, email, etc.)
+  
     const events = await Event.find(query).populate("createdBy", "name _id role");
 
-    // Map events to add organizerId and optionally overwrite institute with createdBy.name
     const mappedEvents = events.map(event => ({
       _id: event._id,
       eventType: event.eventType,
       eventName: event.eventName,
-      institute: event.institute || event.createdBy.name, // fallback to createdBy name if institute missing
+      institute: event.institute || event.createdBy.name,
       location: event.location,
       city: event.city,
       startDate: event.startDate,
@@ -170,7 +169,7 @@ router.get("/search", authenticateToken, async (req, res) => {
       qualificationType: event.qualificationType,
       minDay: event.minDay,
       status: event.status,
-      organizerId: event.createdBy._id.toString(),  // this is what frontend expects
+      organizerId: event.createdBy._id.toString(),  
     }));
 
     res.json(mappedEvents);
@@ -270,7 +269,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "You are not authorized to delete this event" });
     }
 
-    await event.deleteOne();  // or `await Event.findByIdAndDelete(req.params.id);`
+    await event.deleteOne();  
     res.json({ message: "Event deleted successfully" });
 
   } catch (err) {

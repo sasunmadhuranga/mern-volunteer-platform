@@ -22,7 +22,7 @@ export default function ForgotPassword() {
 
       if (res.ok) {
         toast.success(data.message || "Reset link sent! Check your email.");
-        setEmail(""); // clear input
+        setEmail(""); 
       } else {
         toast.error(data.message || "Failed to send reset link.");
       }

@@ -10,7 +10,6 @@ export default function Landing() {
   const { setUser, setToken } = useUser();
   const [loading, setLoading] = useState(true);
 
-  // Fetch public events
   useEffect(() => {
     const fetchPublicEvents = async () => {
       try {
@@ -28,11 +27,10 @@ export default function Landing() {
   }, [API_BASE_URL]);
 
 
-  // Check if user is logged in
   useEffect(() => {
     const redirectIfLoggedIn = async () => {
       const token = localStorage.getItem("token");
-      if (!token) return; // Not logged in, stay on landing
+      if (!token) return; 
 
       try {
         const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
@@ -42,14 +40,13 @@ export default function Landing() {
         setUser(user);
         setToken(token);
 
-        // Redirect by role
         if (user.role === "ADMIN") navigate("/admin", { replace: true });
         else if (user.role === "ORG_ADMIN") navigate("/org", { replace: true });
         else navigate("/volunteer", { replace: true });
 
       } catch (err) {
         console.log("Token invalid or expired", err);
-        localStorage.removeItem("token"); // remove invalid token
+        localStorage.removeItem("token");
       }
     };
 
@@ -58,7 +55,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
+    
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-4">
           <h1 className="text-2xl font-bold bg-gradient-to-br from-violet-600 to-blue-700 bg-clip-text text-transparent">
@@ -79,8 +76,6 @@ export default function Landing() {
         </div>
       </header>
 
-
-      {/* Hero Section */}
       <section className="bg-gradient-to-br from-violet-600 to-blue-700 text-white py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
@@ -106,7 +101,6 @@ export default function Landing() {
             </button>
           </div>
 
-          {/* Stats */}
           <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 text-sky-100">
             <div>
               <p className="text-3xl font-bold">100+</p>
@@ -198,7 +192,6 @@ export default function Landing() {
         )}
 
 
-      {/* Footer */}
       <footer className="text-center text-sm text-gray-500 py-6 border-t">
         © {new Date().getFullYear()} VolunteerHub. All rights reserved.
       </footer>

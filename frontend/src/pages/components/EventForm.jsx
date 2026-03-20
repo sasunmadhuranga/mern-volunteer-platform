@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function EventForm({ initialValues = {}, onSubmit, isEditMode = false }) {
-  // Default values or from initialValues (editing)
+  
   const [eventName, setEventName] = useState(initialValues.eventName || "");
   const [institute, setInstitute] = useState(initialValues.institute || "");
   const [location, setLocation] = useState(initialValues.location || "");
@@ -20,7 +20,6 @@ export default function EventForm({ initialValues = {}, onSubmit, isEditMode = f
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Pass the whole form data back to parent
     onSubmit({
       eventName,
       institute,

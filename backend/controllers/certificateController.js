@@ -7,12 +7,12 @@ import path from "path";
 import User from "../models/User.js";
 import fs from "fs";
 
-// Get volunteer eligible events for certificates
+
 export const getEligibleEvents = async (req, res) => {
   try {
     const volunteerId = req.user.id;
 
-    // Get approved event applications
+    
     const applications = await EventApplication.find({
       userId: volunteerId,
       status: "approved"
@@ -23,14 +23,14 @@ export const getEligibleEvents = async (req, res) => {
     for (const app of applications) {
       const event = app.eventId;
 
-      // Count days attended
+      
       const attendedDays = await Attendance.countDocuments({
         eventId: event._id,
         volunteerId
       });
 
       if (attendedDays >= event.minDay) {
-        // Get organization-selected template
+        
         const orgTemplate = await OrgCertificateTemplate.findOne({
           orgId: event.createdBy,
           isActive: true
@@ -90,7 +90,6 @@ export const generateCertificate = async (req, res) => {
         .json({ message: "No template selected by organization" });
     }
 
-    /* -------------------- TEMPLATE CSS -------------------- */
     const printCSS = `
       <style>
         @page { size: A4; margin: 0; }
@@ -100,7 +99,6 @@ export const generateCertificate = async (req, res) => {
 
     let html = printCSS + orgTemplate.templateId.htmlTemplate;
 
-    /* -------------------- PLACEHOLDERS -------------------- */
     html = html.replace(/{{\s*volunteerName\s*}}/gi, application.name);
     html = html.replace(/{{\s*eventName\s*}}/gi, application.eventId.eventName);
     html = html.replace(/{{\s*organizationName\s*}}/gi, orgUser.name);
@@ -116,7 +114,6 @@ export const generateCertificate = async (req, res) => {
     );
     html = html.replace(/{{\s*daysVolunteered\s*}}/gi, attendedDays);
 
-    /* -------------------- SIGNATURE -------------------- */
     let signatureImg = "";
 
     if (orgTemplate.signature) {
@@ -129,7 +126,6 @@ export const generateCertificate = async (req, res) => {
       }
     }
 
-    /* -------------------- SIGNATURE -------------------- */
     html = html.replace(
       /{{\s*signature\s*}}/gi,
       orgTemplate.signature
@@ -143,7 +139,6 @@ export const generateCertificate = async (req, res) => {
       new Date().toLocaleDateString()
     );
 
-    /* -------------------- PDF GENERATION USING html-pdf-node -------------------- */
     const file = { content: html };
     const options = {
       format: 'A4',

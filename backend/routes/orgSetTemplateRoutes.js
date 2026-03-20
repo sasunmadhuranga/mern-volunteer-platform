@@ -3,17 +3,16 @@ import path from 'path';
 import fs from 'fs';
 import { authenticateToken, isOrgAdmin } from '../middleware/authMiddleware.js';
 import OrgCertificateTemplate from '../models/OrgCertificateTemplate.js';
-import User from '../models/User.js'; // import User model
+import User from '../models/User.js';
 import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-// Select template and upload signature
 router.post(
   "/select-template",
   authenticateToken,
   isOrgAdmin,
-  upload.single("signature"), // Cloudinary
+  upload.single("signature"),
   async (req, res) => {
     try {
       const { templateId } = req.body;
@@ -38,7 +37,6 @@ router.post(
 );
 
 
-// Get current template for organization
 router.get("/current", authenticateToken, isOrgAdmin, async (req, res) => {
   try {
     const orgTemplate = await OrgCertificateTemplate.findOne({

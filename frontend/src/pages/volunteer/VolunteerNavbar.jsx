@@ -17,14 +17,13 @@ export default function VolunteerNavbar() {
     );
   }
 
-  const profilePicUrl = user.profilePicUrl; // ✅ use context
+  const profilePicUrl = user.profilePicUrl;
 
   const navClass = ({ isActive }) =>
     isActive ? "text-white border-b-2 border-white-400 pb-1" : "hover:text-gray-300";
 
   return (
     <div className="sticky top-0 z-50 bg-teal-800 shadow-md px-4 md:px-12 py-4 flex justify-between items-center">
-      {/* Left side: Profile picture + name */}
       <NavLink to="/volunteer/volunteerprofile" className="flex items-center space-x-3">
         {profilePicUrl ? (
           <img
@@ -40,7 +39,6 @@ export default function VolunteerNavbar() {
         <span className="hidden md:inline font-semibold text-gray-100">{user.name}</span>
       </NavLink>
 
-      {/* Desktop Nav Links */}
       <div className="hidden md:flex space-x-6 text-gray-100 font-medium">
         <NavLink to="/volunteer" end className={navClass}>Events</NavLink>
         <NavLink to="/volunteer/volunteerprofile" className={navClass}>Profile</NavLink>
@@ -50,7 +48,6 @@ export default function VolunteerNavbar() {
         <button onClick={logout} className="hover:text-gray-300">Logout</button>
       </div>
 
-      {/* Mobile Nav */}
       <button
         className="md:hidden text-2xl text-gray-100 hover:text-gray-300"
         onClick={toggleMenu}

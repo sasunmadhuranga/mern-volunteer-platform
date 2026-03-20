@@ -6,7 +6,7 @@ export default function VolunteerDashboard() {
     <div className="min-h-screen bg-gray-50">
       <VolunteerNavbar/>  
       <div className="px-4 md:px-8">
-        <Outlet />  {/* Sub-page content goes here */}
+        <Outlet />  
       </div>
     </div>
   );

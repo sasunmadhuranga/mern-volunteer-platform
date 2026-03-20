@@ -20,7 +20,6 @@ export default function EventList({
             key={event._id}
             className="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition duration-300 space-y-4"
           >
-            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <h2 className="text-lg md:text-xl font-semibold text-sky-700 leading-snug">
                 {event.eventName}
@@ -40,7 +39,6 @@ export default function EventList({
               </span>
             </div>
 
-            {/* Location Details */}
             <div className="text-sm space-y-1 text-gray-700">
               <p>
                 <span className="font-semibold">City:</span> {event.city}
@@ -59,7 +57,6 @@ export default function EventList({
               </p>
             </div>
 
-            {/* Action Button */}
             <div>
               <button
                 onClick={() =>

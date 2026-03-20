@@ -64,7 +64,7 @@ export default function CreateTemplate() {
         onSubmit={handleSubmit}
         className="grid md:grid-cols-2 gap-8"
       >
-        {/* LEFT SIDE – FORM */}
+        
         <div className="space-y-4">
           <div>
             <label className="block font-medium mb-1">Template Name</label>
@@ -114,7 +114,7 @@ export default function CreateTemplate() {
           </button>
         </div>
 
-        {/* RIGHT SIDE – PREVIEW */}
+
         <div>
           <h3 className="font-semibold mb-2 text-gray-700">
             Live Preview

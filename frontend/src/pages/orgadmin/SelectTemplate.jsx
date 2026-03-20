@@ -78,7 +78,7 @@ export default function SelectTemplate() {
 
       <h2 className="text-xl font-semibold mb-4">Select Template</h2>
 
-      {/* Template Select */}
+      
       <select
         className="border rounded px-3 py-2 mb-4 w-full"
         onChange={(e) => handleTemplateSelect(e.target.value)}
@@ -91,7 +91,6 @@ export default function SelectTemplate() {
         ))}
       </select>
 
-      {/* Signature Upload */}
       <div className="mb-4">
         <label className="block mb-1">Upload Signature:</label>
         <input
@@ -121,7 +120,6 @@ export default function SelectTemplate() {
         </div>
       )}
 
-      {/* Save Button */}
       <button
         onClick={handleSubmit}
         disabled={!selectedTemplate || !signatureFile || !!orgTemplate}

@@ -16,7 +16,6 @@ export default function EventsSection() {
   const [orgError, setOrgError] = useState("");
   const [loadingEvents, setLoadingEvents] = useState(true);
 
-  // Fetch all events on mount
   useEffect(() => {
     const fetchEvents = async () => {
       setLoadingEvents(true);
@@ -32,7 +31,7 @@ export default function EventsSection() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setEvents(res.data); // store all events
+        setEvents(res.data);
       } catch (err) {
         console.error("Failed to fetch events:", err);
         setError("Failed to load events.");
@@ -44,7 +43,6 @@ export default function EventsSection() {
     fetchEvents();
   }, [API_BASE_URL]);
 
-  // Handle search with filters
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -60,7 +58,7 @@ export default function EventsSection() {
         params,
       });
 
-      setEvents(res.data); // override with search results
+      setEvents(res.data); 
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch events.");
@@ -90,16 +88,15 @@ export default function EventsSection() {
 
   if (error) return <p className="text-red-600">{error}</p>;
 
-  // Filter future and ongoing events
   const todayKey = new Date().toISOString().split("T")[0];
   const upcomingEvents = events.filter((event) => event.endDate.split("T")[0] >= todayKey);
 
   return (
     <div className="flex flex-col items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
-      {/* Filter Section */}
+      
       <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 md:w-auto w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 w-full">
-          {/* Event Type */}
+          
           <div className="flex flex-col md:flex-row md:items-center md:space-x-2 w-full md:w-auto">
             <label className="text-gray-700 mb-1 md:mb-0 md:mr-2 whitespace-nowrap">Event Type</label>
             <select
@@ -118,7 +115,6 @@ export default function EventsSection() {
             </select>
           </div>
 
-          {/* Name */}
           <div className="flex flex-col md:flex-row md:items-center md:space-x-2 w-full md:w-auto">
             <label className="text-gray-700 mb-1">Name</label>
             <input
@@ -129,7 +125,6 @@ export default function EventsSection() {
             />
           </div>
 
-          {/* City */}
           <div className="flex flex-col md:flex-row md:items-center md:space-x-2 w-full md:w-auto">
             <label className="text-gray-700 mb-1">City</label>
             <input
@@ -140,7 +135,6 @@ export default function EventsSection() {
             />
           </div>
 
-          {/* Search Button */}
           <div className="w-full md:w-auto">
             <button
               onClick={handleSearch}
@@ -168,7 +162,6 @@ export default function EventsSection() {
       )}
 
 
-      {/* Org Profile Modal */}
       {showOrgProfile && (
         <OrgProfileDisplay
           onClose={() => setShowOrgProfile(false)}

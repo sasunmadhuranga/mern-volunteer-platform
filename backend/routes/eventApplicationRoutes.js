@@ -2,14 +2,14 @@ import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import EventApplication from '../models/EventApplication.js';
 import Event from "../models/Event.js";
-import upload from "../middleware/upload.js"; // Cloudinary middleware
+import upload from "../middleware/upload.js"; 
 
 const router = express.Router();
 
 router.post(
   '/',
   authenticateToken,
-  upload.single('qualificationFile'), // handle file upload
+  upload.single('qualificationFile'), 
   async (req, res) => {
     try {
       const { eventId, name, age, contactEmail, phone } = req.body;
@@ -17,8 +17,8 @@ router.post(
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      // Use file URL from Cloudinary
-      const qualificationFile = req.file ? req.file.path : null; // <-- This URL is fully downloadable
+      
+      const qualificationFile = req.file ? req.file.path : null;
 
       const application = new EventApplication({
         userId: req.user.id,
@@ -40,7 +40,7 @@ router.post(
 );
 
 
-// Get applications for the logged-in user
+
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const applications = await EventApplication.find({ userId: req.user.id })
@@ -81,7 +81,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
   }
 });
 
-// DELETE /api/event-applications/:id → Delete application
+
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const app = await EventApplication.findOneAndDelete({

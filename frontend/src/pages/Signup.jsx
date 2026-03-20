@@ -43,7 +43,6 @@ export default function Signup() {
         setMessage("Registration successful!");
         setMessageType("success");
 
-        // Clear form
         setFormData({
           name: "",
           email: "",

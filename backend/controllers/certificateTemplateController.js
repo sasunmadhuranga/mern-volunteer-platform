@@ -1,6 +1,5 @@
 import CertificateTemplate from "../models/CertificateTemplate.js";
 
-/* CREATE */
 export const createTemplate = async (req, res) => {
   try {
     if (req.user.role !== "ADMIN") {
@@ -18,7 +17,6 @@ export const createTemplate = async (req, res) => {
   }
 };
 
-/* READ ALL (ADMIN) */
 export const getTemplates = async (req, res) => {
   try {
     const templates = await CertificateTemplate.find()
@@ -30,7 +28,6 @@ export const getTemplates = async (req, res) => {
   }
 };
 
-/* READ ALL ACTIVE (ORG / VOLUNTEER) */
 export const getActiveTemplates = async (req, res) => {
   try {
     const templates = await CertificateTemplate.find({ isActive: true })
@@ -42,7 +39,6 @@ export const getActiveTemplates = async (req, res) => {
   }
 };
 
-/* READ ONE */
 export const getTemplateById = async (req, res) => {
   try {
     const template = await CertificateTemplate.findById(req.params.id);
@@ -54,7 +50,6 @@ export const getTemplateById = async (req, res) => {
   }
 };
 
-/* UPDATE */
 export const updateTemplate = async (req, res) => {
   try {
     if (req.user.role !== "ADMIN") {
@@ -77,7 +72,6 @@ export const updateTemplate = async (req, res) => {
   }
 };
 
-/* SOFT DELETE */
 export const deleteTemplate = async (req, res) => {
   try {
     if (req.user.role !== "ADMIN") {

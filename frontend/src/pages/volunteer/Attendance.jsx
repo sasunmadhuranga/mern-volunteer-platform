@@ -17,7 +17,6 @@ export default function AttendanceUI() {
     timeZone: "Asia/Colombo",
   });
 
-  // Fetch approved events
   useEffect(() => {
     async function fetchEvents() {
       try {
@@ -44,7 +43,6 @@ export default function AttendanceUI() {
     fetchEvents();
   }, []);
 
-  // Scanner callback
   const handleScannerComplete = (message) => {
     if (scannerEvent) {
       setAttendanceStatus((prev) => ({
@@ -55,7 +53,6 @@ export default function AttendanceUI() {
     setScannerEvent(null);
   };
 
-  // 1️⃣ Loading
   if (loading) {
     return (
       <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
@@ -64,7 +61,6 @@ export default function AttendanceUI() {
     );
   }
 
-  // 2️⃣ Scanner view
   if (scannerEvent) {
     return (
       <AttendanceScanner
@@ -94,7 +90,7 @@ export default function AttendanceUI() {
               key={event._id}
               className="w-full border rounded-xl p-4 shadow-sm bg-white mb-8"
             >
-              {/* Event info */}
+
               <h2 className="text-center text-lg font-bold text-blue-600">
                 {event.eventName}
               </h2>
@@ -110,7 +106,6 @@ export default function AttendanceUI() {
                 </p>
               )}
 
-              {/* Buttons */}
               {hasStarted && !hasEnded && (
                 <div className="flex gap-3 mt-4">
                   <button
@@ -139,7 +134,6 @@ export default function AttendanceUI() {
                 </div>
               )}
 
-              {/* History */}
               {hasStarted && (
                 <button
                   className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold"
@@ -156,7 +150,6 @@ export default function AttendanceUI() {
                 </button>
               )}
 
-              {/* Status */}
               {attendanceStatus[event._id] && (
                 <p className="mt-2 italic text-sm text-gray-600">
                   {attendanceStatus[event._id]}

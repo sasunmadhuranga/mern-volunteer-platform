@@ -15,7 +15,6 @@ export default function AdminDashboardStats() {
       try {
         const token = localStorage.getItem("token");
 
-        // Fetch all events (for admin)
         const eventsRes = await axios.get(`${API_BASE_URL}/api/events/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -27,7 +26,6 @@ export default function AdminDashboardStats() {
           (event) => new Date(event.endDate) >= today
         ).length;
 
-        // Fetch applications for all events
         let totalApplications = 0;
         for (const event of events) {
           const appsRes = await axios.get(
@@ -57,19 +55,17 @@ export default function AdminDashboardStats() {
 
   return (
     <div className="flex flex-col md:flex-row md:justify-center md:space-x-6 space-y-4 md:space-y-0 p-6">
-      {/* Total Events */}
+      
       <div className={`${cardClass} bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500`}>
         <h2 className="text-xl font-bold">Total Events</h2>
         <p className="text-3xl font-extrabold">{stats.totalEvents}</p>
       </div>
 
-      {/* Active Events */}
       <div className={`${cardClass} bg-gradient-to-r from-green-500 via-teal-500 to-cyan-500`}>
         <h2 className="text-xl font-bold">Active Events</h2>
         <p className="text-3xl font-extrabold">{stats.activeEvents}</p>
       </div>
 
-      {/* Total Applications */}
       <div className={`${cardClass} bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500`}>
         <h2 className="text-xl font-bold">Applications</h2>
         <p className="text-3xl font-extrabold">{stats.totalApplications}</p>

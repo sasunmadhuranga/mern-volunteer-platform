@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import EventList from "../../components/EventList"; // reuse your EventList component
+import EventList from "../../components/EventList"; 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -24,7 +24,7 @@ export default function UpcomingEvents() {
 
         const allEvents = res.data.data || [];
 
-        // Filter only future or ongoing events
+        
         const todayKey = new Date().toISOString().split("T")[0];
         const upcomingEvents = allEvents
           .filter((event) => event.endDate.split("T")[0] >= todayKey)
@@ -57,7 +57,7 @@ export default function UpcomingEvents() {
         </p>
       ) : (
         <EventList
-          events={events} // show all future/ongoing events
+          events={events} 
           handleOrgClick={() => {}}
         />
       )}

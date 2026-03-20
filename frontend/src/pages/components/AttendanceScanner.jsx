@@ -17,9 +17,7 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
     timeZone: "Asia/Colombo",
   });
 
-  // ----------------------
-  // handleScan defined first
-  // ----------------------
+ 
   const handleScan = useCallback(
     async (result) => {
       try {
@@ -60,12 +58,10 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
         setLoading(false);
       }
     },
-    [navigate, onComplete] // only include dynamic dependencies
+    [navigate, onComplete] 
   );
 
-  // ----------------------
-  // useEffect for scanner
-  // ----------------------
+ 
   useEffect(() => {
     const scanner = new Html5Qrcode("qr-reader");
     scannerRef.current = scanner;
@@ -99,11 +95,9 @@ export default function AttendanceScanner({ eventId, eventName, onComplete }) {
           .finally(() => scannerRef.current.clear());
       }
     };
-  }, [handleScan]); // include handleScan here
+  }, [handleScan]); 
 
-  // ----------------------
-  // Render
-  // ----------------------
+  
   return (
     <div className="flex justify-center items-center bg-neutral-100 px-4 py-12 md:px-20 lg:px-40">
       <div className="w-full max-w-md p-6 flex flex-col items-center bg-white rounded-xl shadow">

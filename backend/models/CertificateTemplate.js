@@ -25,7 +25,7 @@ const certificateTemplateSchema = new mongoose.Schema(
     ],
 
     previewImage: {
-      type: String, // optional (cloudinary / local)
+      type: String,
     },
 
     isActive: {
@@ -35,7 +35,7 @@ const certificateTemplateSchema = new mongoose.Schema(
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // admin
+      ref: "User",
       required: true,
     },
   },

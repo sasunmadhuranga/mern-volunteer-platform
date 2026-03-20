@@ -16,7 +16,6 @@ export default function EditTemplate() {
 
   const [loading, setLoading] = useState(false);
 
-  // Fetch template data on mount
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
@@ -73,7 +72,6 @@ export default function EditTemplate() {
       </h1>
 
       <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
-        {/* LEFT SIDE – FORM */}
         <div className="space-y-4">
           <div>
             <label className="block font-medium mb-1">Template Name</label>
@@ -115,7 +113,6 @@ export default function EditTemplate() {
           </button>
         </div>
 
-        {/* RIGHT SIDE – PREVIEW */}
         <div>
           <h3 className="font-semibold mb-2 text-gray-700">Live Preview</h3>
           <div className="border rounded-lg p-6 bg-white shadow max-h-[600px] overflow-auto">

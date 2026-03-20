@@ -107,7 +107,6 @@ export default function AdminTemplates() {
                 { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                // Update local state to mark template as inactive
                 setTemplates(prev =>
                 prev.map(t =>
                     t._id === selectedTemplateId ? { ...t, isActive: false } : t
