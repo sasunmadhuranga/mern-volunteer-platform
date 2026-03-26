@@ -1,29 +1,110 @@
-Developed a full-stack MERN-based volunteer management platform with an integrated React Native mobile application to streamline event management, volunteer management, attendance tracking, and certificate generation. The system supports role-based access for Super Admins, Organization Admins, and Volunteers, enabling secure event workflows and accurate attendance tracking using time-bound QR codes. The platform ensures data integrity, scalability, and a seamless experience across web and mobile. Deployed the frontend on Vercel, backend APIs on Render, utilized MongoDB Atlas for cloud-hosted data storage, and integrated Cloudinary for secure image and file management.
+🟡🟡 MERN Volunteer Management Platform 🟡🟡
+A full-stack MERN-based volunteer management system with an integrated React Native mobile application, designed to streamline event coordination, volunteer participation, attendance tracking, and certificate generation.
 
-✅ Implemented role-based access control for Super Admins, Organization Admins, and Volunteers.
+▶ Overview
+This platform enables organizations to efficiently manage volunteer-driven events while providing volunteers with a seamless experience across web and mobile applications.
+It features role-based access control, secure workflows, QR-based attendance tracking, and automated certificate generation, ensuring data integrity, scalability, and usability.
 
-✅ Enabled organizations to create and manage events, and approve volunteer applications.
+▶ Key Features
+🔶 Authentication & Security
+•	JWT-based authentication
+•	Role-Based Access Control (RBAC):
+o	Super Admin
+o	Organization Admin
+o	Volunteer
 
-✅ Developed a secure QR-based attendance system with daily, time-bound tokens for check-in and check-out.
+🔶 Volunteer Management
+•	Volunteer registration and login
+•	Apply for events
+•	Track application status
+•	View attendance history
+•	Access certificates
 
-✅ Validated attendance against event dates, time windows, approval status, and QR token expiration to prevent misuse.
+🔶 Organization Management
+•	Create and manage events
+•	Review and approve/reject volunteer applications
+•	Monitor participation and attendance
 
-✅ Built dynamic certificate generation with reusable templates and placeholders for volunteer and event details.
+🔶 Event Management
+•	Event creation with date/time validation
+•	Participant tracking
+•	Approval-based participation system
 
-✅ Allowed eligible volunteers to generate certificates after meeting minimum participation requirements.
+🔶 QR-Based Attendance System
+•	Secure time-bound QR tokens
+•	Check-in and check-out functionality
+•	Validation based on:
+o	Event date
+o	Time window
+o	Approval status
+o	Token expiration
 
-✅ Provided volunteers with event discovery, application tracking, attendance history, and certificate access.
+🔶 Certificate Generation
+•	Dynamic certificate creation using templates
+•	Placeholder-based customization (name, event, etc.)
+•	Eligibility-based access for volunteers
+•	Downloadable certificates
 
-✅ Integrated JWT authentication and RESTful APIs for secure and scalable backend communication.
+🔶 File & Image Management
+•	Profile images and qualification PDFs stored using Cloudinary
+•	Secure and scalable file handling
+•	Optimized delivery via CDN
 
-✅ Designed responsive, modern user interfaces for both web and mobile platforms.
+🔶 Cross-Platform Experience
+•	Web application (React)
+•	Mobile application (React Native with Expo)
+•	Responsive and modern UI design
 
-Tools & Technologies:
+🔶 Tech Stack
+Frontend (Web)
+•	React
+•	Axios
+•	Tailwind CSS (or your styling framework)
+Mobile App
+•	React Native (Expo)
+Backend
+•	Node.js
+•	Express.js
+•	RESTful APIs
+Database
+•	MongoDB Atlas (Cloud-hosted)
+File Storage
+•	Cloudinary (Images & PDFs)
+Authentication
+•	JSON Web Tokens (JWT)
+Deployment
+•	Frontend: Vercel
+•	Backend: Render
+Testing
+•	Jest + Supertest
+•	MongoDB Memory Server (for isolated test environment)
 
-🟡 MongoDB
-🟡 Express.js
-🟡 React
-🟡 Node.js
-🟡 React Native (Expo)
-🟡 JWT Authentication
-🟡 RESTful APIs
+🔶 CI/CD
+•	Automated deployments via GitHub integration:
+o	Vercel for frontend
+o	Render for backend
+•	Backend CI pipeline using GitHub Actions:
+o	Runs integration tests on every push and pull request
+o	Uses in-memory MongoDB for isolated testing
+
+🔶 Deployment
+•	Frontend: Hosted on Vercel
+•	Backend: Hosted on Render
+•	Database: MongoDB Atlas
+•	File Storage: Cloudinary
+
+Screenshots
+<p align = "center">
+    <img src="screenshots/1.png" width="600"/>
+    <img src="screenshots/2.png" width="600"/>
+    <img src="screenshots/5.png" width="600"/>
+    <img src="screenshots/6.png" width="600"/>
+    <img src="screenshots/7.png" width="600"/>
+    <img src="screenshots/10.png" width="600"/>
+    <img src="screenshots/13.png" width="600"/>
+</p>
+
+Author
+Sasun Madhuranga
+GitHub: https://github.com/sasunmadhuranga
+

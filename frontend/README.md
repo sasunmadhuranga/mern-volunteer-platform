@@ -19,3 +19,11 @@ Developed a full-stack MERN-based volunteer management platform with an integrat
 ✅ Designed responsive, modern user interfaces for both web and mobile platforms.
 
 Tools & Technologies:
+
+🟡 MongoDB
+🟡 Express.js
+🟡 React
+🟡 Node.js
+🟡 React Native (Expo)
+🟡 JWT Authentication
+🟡 RESTful APIs
