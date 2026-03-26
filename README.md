@@ -12,58 +12,83 @@ It features role-based access control, secure workflows, QR-based attendance tra
 🔶 Authentication & Security
 
 •	JWT-based authentication
+
 •	Role-Based Access Control (RBAC):
+
     o	Super Admin
+
     o	Organization Admin
+
     o	Volunteer
 
 🔶 Volunteer Management
 
 •	Volunteer registration and login
+
 •	Apply for events
+
 •	Track application status
+
 •	View attendance history
+
 •	Access certificates
 
 🔶 Organization Management
 
 •	Create and manage events
+
 •	Review and approve/reject volunteer applications
+
 •	Monitor participation and attendance
 
 🔶 Event Management
 
 •	Event creation with date/time validation
+
 •	Participant tracking
+
 •	Approval-based participation system
 
 🔶 QR-Based Attendance System
 
 •	Secure time-bound QR tokens
+
 •	Check-in and check-out functionality
+
 •	Validation based on:
+
     o	Event date
+
     o	Time window
+
     o	Approval status
+
     o	Token expiration
 
 🔶 Certificate Generation
 
 •	Dynamic certificate creation using templates
+
 •	Placeholder-based customization (name, event, etc.)
+
 •	Eligibility-based access for volunteers
+
 •	Downloadable certificates
 
 🔶 File & Image Management
 
 •	Profile images and qualification PDFs stored using Cloudinary
+
 •	Secure and scalable file handling
+
 •	Optimized delivery via CDN
 
 🔶 Cross-Platform Experience
 
 •	Web application (React)
+
 •	Mobile application (React Native with Expo)
+
 •	Responsive and modern UI design
 
 🔶 Tech Stack
@@ -71,7 +96,9 @@ It features role-based access control, secure workflows, QR-based attendance tra
 Frontend (Web)
 
 •	React
+
 •	Axios
+
 •	Tailwind CSS (or your styling framework)
 
 Mobile App
@@ -81,7 +108,9 @@ Mobile App
 Backend
 
 •	Node.js
+
 •	Express.js
+
 •	RESTful APIs
 
 Database
@@ -99,27 +128,37 @@ Authentication
 Deployment
 
 •	Frontend: Vercel
+
 •	Backend: Render
 
 Testing
 
 •	Jest + Supertest
+
 •	MongoDB Memory Server (for isolated test environment)
 
 🔶 CI/CD
 
 •	Automated deployments via GitHub integration:
-o	Vercel for frontend
-o	Render for backend
+
+    o	Vercel for frontend
+
+    o	Render for backend
+
 •	Backend CI pipeline using GitHub Actions:
-o	Runs integration tests on every push and pull request
-o	Uses in-memory MongoDB for isolated testing
+
+    o	Runs integration tests on every push and pull request
+
+    o	Uses in-memory MongoDB for isolated testing
 
 🔶 Deployment
 
 •	Frontend: Hosted on Vercel
+
 •	Backend: Hosted on Render
+
 •	Database: MongoDB Atlas
+
 •	File Storage: Cloudinary
 
 Screenshots
@@ -135,6 +174,8 @@ Screenshots
 </p>
 
 Author
+
 Sasun Madhuranga
+
 GitHub: https://github.com/sasunmadhuranga
 
